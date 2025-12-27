@@ -24,28 +24,95 @@
             padding-bottom: 100px;
         }
 
+        /* TABS */
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            color: #64748b;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: #2563eb;
+            background: #eff6ff;
+            border-bottom: 3px solid #2563eb;
+            margin-bottom: -2px;
+        }
+
+        /* HEADER */
         .header {
             background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             color: white;
             padding: 20px;
             text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
         }
 
         .header h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 5px;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
         }
 
-        .header .date {
-            font-size: 1rem;
-            opacity: 0.9;
+        /* DATE SELECTOR */
+        .date-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            margin: 0;
+            border-bottom: 1px solid #e2e8f0;
         }
 
+        .date-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: #e2e8f0;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .date-btn:active {
+            background: #cbd5e1;
+        }
+
+        .current-date {
+            text-align: center;
+            min-width: 180px;
+        }
+
+        .current-date .day {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .current-date .full {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* SUMMARY */
         .summary {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -63,49 +130,153 @@
         }
 
         .summary-item .number {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 700;
             color: #2563eb;
         }
 
         .summary-item .label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #64748b;
             margin-top: 2px;
         }
 
-        .employee-list {
+        /* PAGE */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* EMPLOYEE LIST - PUANTAJ */
+        .puantaj-list {
             padding: 0 15px;
         }
 
-        .employee-card {
+        .puantaj-card {
             background: white;
-            border-radius: 16px;
-            padding: 15px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-            border-left: 4px solid #e2e8f0;
-        }
-
-        .employee-card.has-name {
-            border-left-color: #2563eb;
-        }
-
-        .employee-card.has-mesai {
-            border-left-color: #10b981;
-            background: linear-gradient(to right, #f0fdf4, white);
-        }
-
-        .employee-header {
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 12px;
         }
 
-        .employee-number {
-            width: 32px;
-            height: 32px;
+        .puantaj-card.worked {
+            border-left: 4px solid #2563eb;
+        }
+
+        .puantaj-card.mesai {
+            border-left: 4px solid #10b981;
+            background: linear-gradient(to right, #f0fdf4, white);
+        }
+
+        .puantaj-card.off {
+            opacity: 0.5;
+            border-left: 4px solid #ef4444;
+        }
+
+        .emp-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .emp-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .emp-hours {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .puantaj-inputs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .time-input {
+            width: 70px;
+            padding: 8px 4px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .mesai-input {
+            width: 45px;
+            padding: 8px 4px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: #f0fdf4;
+            border-color: #10b981;
+        }
+
+        .mesai-input:focus {
+            outline: none;
+        }
+
+        .off-btn {
+            padding: 8px 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .off-btn.active {
+            background: #dc2626;
+            color: white;
+        }
+
+        /* EMPLOYEE MANAGEMENT */
+        .employee-section {
+            padding: 15px;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 10px;
+            padding-left: 5px;
+        }
+
+        .employee-item {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .employee-num {
+            width: 30px;
+            height: 30px;
             background: #2563eb;
             color: white;
             border-radius: 50%;
@@ -113,238 +284,102 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             flex-shrink: 0;
         }
 
-        .employee-name {
+        .employee-input {
             flex: 1;
             border: none;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e293b;
-            background: transparent;
+            font-size: 1rem;
+            font-weight: 500;
             padding: 8px 0;
             border-bottom: 2px solid #e2e8f0;
         }
 
-        .employee-name:focus {
+        .employee-input:focus {
             outline: none;
             border-bottom-color: #2563eb;
         }
 
-        .employee-name::placeholder {
-            color: #94a3b8;
-            font-weight: 400;
-        }
-
-        .time-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .time-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .time-group label {
-            font-size: 0.75rem;
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        .time-group input {
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 1.1rem;
-            text-align: center;
-            font-weight: 600;
-            color: #1e293b;
-            background: #f8fafc;
-        }
-
-        .time-group input:focus {
-            outline: none;
-            border-color: #2563eb;
-            background: white;
-        }
-
-        .mesai-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px;
-            background: #f8fafc;
-            border-radius: 10px;
-            gap: 10px;
-        }
-
-        .mesai-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            flex: 1;
-        }
-
-        .mesai-toggle input[type="checkbox"] {
-            display: none;
-        }
-
-        .toggle-switch {
-            width: 52px;
-            height: 28px;
-            background: #cbd5e1;
-            border-radius: 14px;
-            position: relative;
-            transition: background 0.3s;
-            flex-shrink: 0;
-        }
-
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            background: white;
-            border-radius: 50%;
-            top: 3px;
-            left: 3px;
-            transition: transform 0.3s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .mesai-toggle input:checked + .toggle-switch {
-            background: #10b981;
-        }
-
-        .mesai-toggle input:checked + .toggle-switch::after {
-            transform: translateX(24px);
-        }
-
-        .mesai-toggle span {
-            font-size: 0.95rem;
-            color: #475569;
-            font-weight: 500;
-        }
-
-        .mesai-saat {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .mesai-saat input {
-            width: 60px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 8px;
-            font-size: 1rem;
-            text-align: center;
-            font-weight: 600;
-            background: white;
-        }
-
-        .mesai-saat input:focus {
-            outline: none;
-            border-color: #10b981;
-        }
-
-        .mesai-saat input:disabled {
-            background: #f1f5f9;
-            color: #94a3b8;
-        }
-
-        .mesai-saat span {
-            font-size: 0.85rem;
-            color: #64748b;
-        }
-
-        .add-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            color: white;
+        .delete-btn {
+            background: none;
             border: none;
-            border-radius: 50%;
-            font-size: 2rem;
+            color: #ef4444;
+            font-size: 1.1rem;
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
+            padding: 5px;
+            opacity: 0.6;
         }
 
-        .add-btn:active {
-            transform: scale(0.95);
-        }
-
+        /* MESAI SUMMARY */
         .mesai-summary {
             margin: 15px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border-radius: 16px;
-            padding: 20px;
+            padding: 15px;
             color: white;
         }
 
         .mesai-summary h2 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
         }
 
         .mesai-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .mesai-person {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             background: rgba(255,255,255,0.2);
-            padding: 10px 15px;
-            border-radius: 10px;
-        }
-
-        .mesai-person .name {
-            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
         }
 
         .mesai-person .hours {
             background: white;
             color: #059669;
-            padding: 4px 12px;
-            border-radius: 20px;
+            padding: 2px 10px;
+            border-radius: 15px;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
+        /* ADD BUTTON */
+        .add-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+            z-index: 100;
+        }
+
+        /* SAVE STATUS */
         .save-status {
             position: fixed;
             bottom: 20px;
             left: 20px;
             background: #1e293b;
             color: white;
-            padding: 10px 16px;
-            border-radius: 25px;
-            font-size: 0.85rem;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.3s;
@@ -357,39 +392,37 @@
         }
 
         .save-status .dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background: #10b981;
             border-radius: 50%;
         }
 
-        .delete-btn {
-            background: none;
-            border: none;
-            color: #ef4444;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 5px;
-            opacity: 0.6;
-        }
-
-        .delete-btn:active {
-            opacity: 1;
-        }
-
+        /* EMPTY */
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px 20px;
             color: #64748b;
         }
 
         .empty-state .icon {
-            font-size: 4rem;
-            margin-bottom: 15px;
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        /* INFO BOX */
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin: 15px;
+            font-size: 0.85rem;
+            color: #1e40af;
         }
 
         @media (min-width: 768px) {
-            .employee-list, .summary, .mesai-summary {
+            .puantaj-list, .employee-section, .summary, .mesai-summary, .info-box {
                 max-width: 600px;
                 margin-left: auto;
                 margin-right: auto;
@@ -398,34 +431,78 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>📋 Vardiya Takip</h1>
-        <div class="date" id="currentDate"></div>
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab active" onclick="showPage('puantaj')">📋 Puantaj</button>
+        <button class="tab" onclick="showPage('employees')">👥 Çalışanlar</button>
+        <button class="tab" onclick="showPage('report')">📊 Rapor</button>
     </div>
 
-    <div class="summary">
-        <div class="summary-item">
-            <div class="number" id="totalCount">0</div>
-            <div class="label">Çalışan</div>
+    <!-- PUANTAJ PAGE -->
+    <div class="page active" id="puantajPage">
+        <div class="header">
+            <h1>📋 Günlük Puantaj</h1>
         </div>
-        <div class="summary-item">
-            <div class="number" id="mesaiCount">0</div>
-            <div class="label">Mesaide</div>
+
+        <div class="date-selector">
+            <button class="date-btn" onclick="changeDate(-1)">◀</button>
+            <div class="current-date">
+                <div class="day" id="currentDay">Bugün</div>
+                <div class="full" id="currentDate"></div>
+            </div>
+            <button class="date-btn" onclick="changeDate(1)">▶</button>
         </div>
-        <div class="summary-item">
-            <div class="number" id="totalHours">0</div>
-            <div class="label">Toplam Saat</div>
+
+        <div class="summary">
+            <div class="summary-item">
+                <div class="number" id="workingCount">0</div>
+                <div class="label">Çalışan</div>
+            </div>
+            <div class="summary-item">
+                <div class="number" id="mesaiCount">0</div>
+                <div class="label">Mesaide</div>
+            </div>
+            <div class="summary-item">
+                <div class="number" id="totalHours">0</div>
+                <div class="label">Toplam Saat</div>
+            </div>
+        </div>
+
+        <div class="puantaj-list" id="puantajList"></div>
+
+        <div class="mesai-summary" id="mesaiSummary" style="display:none">
+            <h2>✅ Mesaiye Kalanlar</h2>
+            <div class="mesai-list" id="mesaiList"></div>
         </div>
     </div>
 
-    <div class="employee-list" id="employeeList"></div>
+    <!-- EMPLOYEES PAGE -->
+    <div class="page" id="employeesPage">
+        <div class="header">
+            <h1>👥 Çalışan Listesi</h1>
+        </div>
 
-    <div class="mesai-summary" id="mesaiSummary" style="display: none;">
-        <h2>✅ Mesaiye Kalanlar</h2>
-        <div class="mesai-list" id="mesaiList"></div>
+        <div class="info-box">
+            💡 Çalışanları buraya bir kez ekleyin. Her gün puantaj sekmesinde otomatik görünecekler.
+        </div>
+
+        <div class="employee-section" id="employeeSection"></div>
     </div>
 
-    <button class="add-btn" onclick="addEmployee()">+</button>
+    <!-- REPORT PAGE -->
+    <div class="page" id="reportPage">
+        <div class="header">
+            <h1>📊 Aylık Rapor</h1>
+        </div>
+
+        <div class="info-box">
+            📅 Bu ay çalışanların toplam çalışma saatleri
+        </div>
+
+        <div class="employee-section" id="reportSection"></div>
+    </div>
+
+    <button class="add-btn" id="addBtn" onclick="addEmployee()">+</button>
 
     <div class="save-status" id="saveStatus">
         <span class="dot"></span>
@@ -433,34 +510,36 @@
     </div>
 
     <script>
-        let employees = [];
+        // VERİ YAPISI
+        let employees = [];      // [{id, name}]
+        let records = {};        // {"2025-12-28": {empId: {start, end, mesai, off}}}
+        let currentDate = new Date();
+        let currentPage = 'puantaj';
         let saveTimeout;
 
-        // Tarih göster
-        function showDate() {
-            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('tr-TR', options);
-        }
+        const DB_NAME = 'VardiyaDB2';
 
         // IndexedDB
-        const DB_NAME = 'VardiyaDB';
         function openDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, 1);
                 request.onerror = () => reject(request.error);
                 request.onsuccess = () => resolve(request.result);
                 request.onupgradeneeded = (e) => {
-                    e.target.result.createObjectStore('data', { keyPath: 'id' });
+                    const db = e.target.result;
+                    db.createObjectStore('data', { keyPath: 'id' });
                 };
             });
         }
 
-        // Otomatik Kaydet
+        // Kaydet
         async function saveData() {
             try {
                 const db = await openDB();
                 const tx = db.transaction('data', 'readwrite');
-                tx.objectStore('data').put({ id: 'main', employees });
+                const store = tx.objectStore('data');
+                store.put({ id: 'employees', data: employees });
+                store.put({ id: 'records', data: records });
                 
                 const status = document.getElementById('saveStatus');
                 status.classList.add('show');
@@ -474,132 +553,194 @@
             try {
                 const db = await openDB();
                 const tx = db.transaction('data', 'readonly');
-                const request = tx.objectStore('data').get('main');
-                return new Promise(r => {
-                    request.onsuccess = () => r(request.result?.employees || []);
-                    request.onerror = () => r([]);
+                const store = tx.objectStore('data');
+                
+                const empReq = store.get('employees');
+                const recReq = store.get('records');
+                
+                return new Promise(resolve => {
+                    tx.oncomplete = () => {
+                        employees = empReq.result?.data || [];
+                        records = recReq.result?.data || {};
+                        resolve();
+                    };
+                    tx.onerror = () => resolve();
                 });
-            } catch (e) { return []; }
+            } catch (e) { console.error(e); }
+        }
+
+        // Tarih formatla
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatDateTR(date) {
+            return date.toLocaleDateString('tr-TR', { 
+                weekday: 'long', 
+                day: 'numeric', 
+                month: 'long' 
+            });
+        }
+
+        // Tarih değiştir
+        function changeDate(delta) {
+            currentDate.setDate(currentDate.getDate() + delta);
+            renderPuantaj();
+        }
+
+        // Sayfa göster
+        function showPage(page) {
+            currentPage = page;
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(page + 'Page').classList.add('active');
+            document.querySelector(`.tab[onclick="showPage('${page}')"]`).classList.add('active');
+            
+            document.getElementById('addBtn').style.display = page === 'employees' ? 'flex' : 'none';
+            
+            if (page === 'puantaj') renderPuantaj();
+            else if (page === 'employees') renderEmployees();
+            else if (page === 'report') renderReport();
         }
 
         // Çalışan Ekle
         function addEmployee() {
             const id = Date.now();
-            employees.push({
-                id,
-                name: '',
-                startTime: '08:00',
-                endTime: '17:00',
-                mesai: false,
-                mesaiSaat: 0
-            });
-            renderList();
+            employees.push({ id, name: '' });
+            renderEmployees();
             saveData();
             
             setTimeout(() => {
-                const card = document.querySelector(`[data-id="${id}"]`);
-                if (card) {
-                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    card.querySelector('.employee-name').focus();
-                }
+                const input = document.querySelector(`[data-emp-id="${id}"] .employee-input`);
+                if (input) input.focus();
             }, 100);
         }
 
         // Çalışan Sil
         function deleteEmployee(id) {
-            employees = employees.filter(e => e.id !== id);
-            renderList();
-            saveData();
-        }
-
-        // Güncelle
-        function updateEmployee(id, field, value) {
-            const emp = employees.find(e => e.id === id);
-            if (emp) {
-                if (field === 'mesaiSaat') {
-                    emp[field] = Math.max(0, Math.min(12, parseInt(value) || 0));
-                } else if (field === 'mesai') {
-                    emp[field] = value;
-                    if (!value) emp.mesaiSaat = 0;
-                } else {
-                    emp[field] = value;
-                }
-                renderList();
+            if (confirm('Bu çalışanı silmek istediğinize emin misiniz?')) {
+                employees = employees.filter(e => e.id !== id);
+                renderEmployees();
                 saveData();
             }
         }
 
-        // Liste Göster
-        function renderList() {
-            const container = document.getElementById('employeeList');
+        // Çalışan Güncelle
+        function updateEmployeeName(id, name) {
+            const emp = employees.find(e => e.id === id);
+            if (emp) {
+                emp.name = name;
+                saveData();
+            }
+        }
+
+        // Puantaj Güncelle
+        function updateRecord(empId, field, value) {
+            const dateKey = formatDate(currentDate);
+            if (!records[dateKey]) records[dateKey] = {};
+            if (!records[dateKey][empId]) {
+                records[dateKey][empId] = { start: '08:00', end: '17:00', mesai: 0, off: false };
+            }
             
-            if (employees.length === 0) {
+            if (field === 'off') {
+                records[dateKey][empId].off = value;
+            } else if (field === 'mesai') {
+                records[dateKey][empId].mesai = Math.max(0, Math.min(12, parseInt(value) || 0));
+            } else {
+                records[dateKey][empId][field] = value;
+            }
+            
+            renderPuantaj();
+            saveData();
+        }
+
+        // Puantaj Render
+        function renderPuantaj() {
+            const dateKey = formatDate(currentDate);
+            const today = formatDate(new Date());
+            
+            // Tarih göster
+            const isToday = dateKey === today;
+            document.getElementById('currentDay').textContent = isToday ? 'Bugün' : '';
+            document.getElementById('currentDate').textContent = formatDateTR(currentDate);
+            
+            const container = document.getElementById('puantajList');
+            const namedEmployees = employees.filter(e => e.name.trim());
+            
+            if (namedEmployees.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="icon">👥</div>
-                        <p>Henüz çalışan yok<br><small>+ ile ekleyin</small></p>
+                        <p>Önce "Çalışanlar" sekmesinden<br>çalışan ekleyin</p>
                     </div>`;
-                updateSummary();
+                updateSummary([]);
                 return;
             }
 
-            container.innerHTML = employees.map((emp, i) => `
-                <div class="employee-card ${emp.name ? 'has-name' : ''} ${emp.mesai ? 'has-mesai' : ''}" data-id="${emp.id}">
-                    <div class="employee-header">
-                        <div class="employee-number">${i + 1}</div>
-                        <input type="text" class="employee-name" value="${emp.name}" 
-                               placeholder="İsim yazın..."
-                               onchange="updateEmployee(${emp.id}, 'name', this.value)">
-                        <button class="delete-btn" onclick="deleteEmployee(${emp.id})">🗑️</button>
-                    </div>
-                    
-                    <div class="time-row">
-                        <div class="time-group">
-                            <label>Giriş</label>
-                            <input type="time" value="${emp.startTime}" 
-                                   onchange="updateEmployee(${emp.id}, 'startTime', this.value)">
+            const dayRecords = records[dateKey] || {};
+            
+            container.innerHTML = namedEmployees.map(emp => {
+                const rec = dayRecords[emp.id] || { start: '08:00', end: '17:00', mesai: 0, off: false };
+                const isOff = rec.off;
+                const hasMesai = rec.mesai > 0;
+                
+                let cardClass = 'puantaj-card';
+                if (isOff) cardClass += ' off';
+                else if (hasMesai) cardClass += ' mesai';
+                else cardClass += ' worked';
+                
+                const hours = isOff ? 0 : calcHours(rec.start, rec.end) + rec.mesai;
+                
+                return `
+                    <div class="${cardClass}">
+                        <div class="emp-info">
+                            <div class="emp-name">${emp.name}</div>
+                            <div class="emp-hours">${isOff ? 'İzinli' : hours.toFixed(1) + ' saat'}</div>
                         </div>
-                        <div class="time-group">
-                            <label>Çıkış</label>
-                            <input type="time" value="${emp.endTime}" 
-                                   onchange="updateEmployee(${emp.id}, 'endTime', this.value)">
+                        <div class="puantaj-inputs">
+                            <input type="time" class="time-input" value="${rec.start}" 
+                                   ${isOff ? 'disabled' : ''}
+                                   onchange="updateRecord(${emp.id}, 'start', this.value)">
+                            <input type="time" class="time-input" value="${rec.end}" 
+                                   ${isOff ? 'disabled' : ''}
+                                   onchange="updateRecord(${emp.id}, 'end', this.value)">
+                            <input type="number" class="mesai-input" value="${rec.mesai}" min="0" max="12"
+                                   placeholder="M" ${isOff ? 'disabled' : ''}
+                                   onchange="updateRecord(${emp.id}, 'mesai', this.value)">
+                            <button class="off-btn ${isOff ? 'active' : ''}" 
+                                    onclick="updateRecord(${emp.id}, 'off', ${!isOff})">
+                                ${isOff ? '✓ İzin' : 'İzin'}
+                            </button>
                         </div>
                     </div>
-                    
-                    <div class="mesai-row">
-                        <label class="mesai-toggle">
-                            <input type="checkbox" ${emp.mesai ? 'checked' : ''} 
-                                   onchange="updateEmployee(${emp.id}, 'mesai', this.checked)">
-                            <div class="toggle-switch"></div>
-                            <span>Mesai Yaptı</span>
-                        </label>
-                        <div class="mesai-saat">
-                            <input type="number" value="${emp.mesaiSaat}" min="0" max="12"
-                                   ${emp.mesai ? '' : 'disabled'}
-                                   onchange="updateEmployee(${emp.id}, 'mesaiSaat', this.value)">
-                            <span>saat</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
-            updateSummary();
+            updateSummary(namedEmployees.map(emp => ({
+                ...emp,
+                ...(dayRecords[emp.id] || { start: '08:00', end: '17:00', mesai: 0, off: false })
+            })));
         }
 
-        // Özet Güncelle
-        function updateSummary() {
-            const named = employees.filter(e => e.name.trim());
-            const mesaiOnes = named.filter(e => e.mesai);
+        // Saat hesapla
+        function calcHours(start, end) {
+            const [sh, sm] = start.split(':').map(Number);
+            const [eh, em] = end.split(':').map(Number);
+            return Math.max(0, (eh * 60 + em - sh * 60 - sm) / 60);
+        }
+
+        // Özet güncelle
+        function updateSummary(data) {
+            const working = data.filter(d => !d.off);
+            const mesaiOnes = working.filter(d => d.mesai > 0);
             
             let totalHours = 0;
-            named.forEach(e => {
-                const [sh, sm] = e.startTime.split(':').map(Number);
-                const [eh, em] = e.endTime.split(':').map(Number);
-                totalHours += Math.max(0, (eh * 60 + em - sh * 60 - sm) / 60);
-                totalHours += e.mesaiSaat || 0;
+            working.forEach(d => {
+                totalHours += calcHours(d.start, d.end) + (d.mesai || 0);
             });
 
-            document.getElementById('totalCount').textContent = named.length;
+            document.getElementById('workingCount').textContent = working.length;
             document.getElementById('mesaiCount').textContent = mesaiOnes.length;
             document.getElementById('totalHours').textContent = totalHours.toFixed(1);
 
@@ -608,10 +749,10 @@
             
             if (mesaiOnes.length > 0) {
                 mesaiSummary.style.display = 'block';
-                mesaiList.innerHTML = mesaiOnes.map(e => `
+                mesaiList.innerHTML = mesaiOnes.map(d => `
                     <div class="mesai-person">
-                        <span class="name">${e.name}</span>
-                        <span class="hours">${e.mesaiSaat} saat</span>
+                        <span>${d.name}</span>
+                        <span class="hours">${d.mesai} saat</span>
                     </div>
                 `).join('');
             } else {
@@ -619,25 +760,101 @@
             }
         }
 
-        // Başlat
-        async function init() {
-            showDate();
-            employees = await loadData();
+        // Çalışanlar Render
+        function renderEmployees() {
+            const container = document.getElementById('employeeSection');
             
             if (employees.length === 0) {
-                for (let i = 0; i < 10; i++) {
-                    employees.push({
-                        id: Date.now() + i,
-                        name: '',
-                        startTime: '08:00',
-                        endTime: '17:00',
-                        mesai: false,
-                        mesaiSaat: 0
-                    });
-                }
-                await saveData();
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">👥</div>
+                        <p>Henüz çalışan yok<br><small>+ ile ekleyin</small></p>
+                    </div>`;
+                return;
             }
-            renderList();
+
+            container.innerHTML = `
+                <div class="section-title">Toplam ${employees.length} çalışan</div>
+                ${employees.map((emp, i) => `
+                    <div class="employee-item" data-emp-id="${emp.id}">
+                        <div class="employee-num">${i + 1}</div>
+                        <input type="text" class="employee-input" value="${emp.name}" 
+                               placeholder="İsim girin..."
+                               onchange="updateEmployeeName(${emp.id}, this.value)">
+                        <button class="delete-btn" onclick="deleteEmployee(${emp.id})">🗑️</button>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        // Rapor Render
+        function renderReport() {
+            const container = document.getElementById('reportSection');
+            const namedEmployees = employees.filter(e => e.name.trim());
+            
+            if (namedEmployees.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📊</div>
+                        <p>Henüz veri yok</p>
+                    </div>`;
+                return;
+            }
+
+            // Bu ayın verilerini topla
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            
+            const monthlyData = namedEmployees.map(emp => {
+                let totalHours = 0;
+                let totalMesai = 0;
+                let workDays = 0;
+                
+                Object.keys(records).forEach(dateKey => {
+                    const date = new Date(dateKey);
+                    if (date.getFullYear() === year && date.getMonth() === month) {
+                        const rec = records[dateKey][emp.id];
+                        if (rec && !rec.off) {
+                            workDays++;
+                            totalHours += calcHours(rec.start, rec.end);
+                            totalMesai += rec.mesai || 0;
+                        }
+                    }
+                });
+                
+                return {
+                    name: emp.name,
+                    workDays,
+                    totalHours: totalHours + totalMesai,
+                    totalMesai
+                };
+            });
+
+            const monthName = now.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
+
+            container.innerHTML = `
+                <div class="section-title">${monthName}</div>
+                ${monthlyData.map(d => `
+                    <div class="employee-item">
+                        <div class="emp-info" style="flex:1">
+                            <div class="emp-name">${d.name}</div>
+                            <div class="emp-hours">${d.workDays} gün çalıştı</div>
+                        </div>
+                        <div style="text-align:right">
+                            <div style="font-weight:700;color:#2563eb">${d.totalHours.toFixed(1)} saat</div>
+                            ${d.totalMesai > 0 ? `<div style="font-size:0.75rem;color:#10b981">+${d.totalMesai} mesai</div>` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        // Başlat
+        async function init() {
+            await loadData();
+            renderPuantaj();
+            document.getElementById('addBtn').style.display = 'none';
         }
 
         if ('serviceWorker' in navigator) {
