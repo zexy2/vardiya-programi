@@ -481,6 +481,39 @@
             border-radius: 50%;
         }
 
+        /* INSTALL CTA */
+        .install-cta {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2563eb;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 120;
+        }
+
+        .install-cta button {
+            background: white;
+            color: #2563eb;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .install-cta .later-btn {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+
         /* EMPTY */
         .empty-state {
             text-align: center;
@@ -599,6 +632,12 @@
         Kaydedildi
     </div>
 
+    <div class="install-cta" id="installCta">
+        📲 Ana ekrana ekleyin
+        <button onclick="installApp()">Kur</button>
+        <button class="later-btn" onclick="hideInstallCTA()">Kapat</button>
+    </div>
+
     <script>
         // VERİ YAPISI
         let employees = [];      // [{id, name}]
@@ -608,6 +647,7 @@
         let saveTimeout;
 
         const DEFAULT_RECORD = { start: '', end: '', mesai: 0, off: false };
+        let deferredPrompt = null;
 
         const DB_NAME = 'VardiyaDB2';
 
@@ -1055,6 +1095,45 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(() => {});
         }
+
+        // PWA install handling
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallCTA();
+        });
+
+        function showInstallCTA() {
+            if (isStandalone()) return;
+            const cta = document.getElementById('installCta');
+            if (cta) cta.style.display = 'flex';
+        }
+
+        function hideInstallCTA() {
+            const cta = document.getElementById('installCta');
+            if (cta) cta.style.display = 'none';
+        }
+
+        function isStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        }
+
+        async function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const choice = await deferredPrompt.userChoice;
+                if (choice.outcome === 'accepted') hideInstallCTA();
+                deferredPrompt = null;
+            } else {
+                alert('Eğer “Ana ekrana ekle” uyarısı çıkmazsa:\n\n- iPhone: Paylaş → Ana Ekrana Ekle\n- Android: Sağ üst ⋮ → Ana ekrana ekle');
+            }
+        }
+
+        window.addEventListener('load', () => {
+            if (!isStandalone()) {
+                setTimeout(showInstallCTA, 1200);
+            }
+        });
 
         init();
     </script>
