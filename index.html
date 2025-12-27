@@ -141,6 +141,35 @@
             margin-top: 2px;
         }
 
+        /* Quick actions */
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            padding: 0 15px 15px 15px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: #0f172a;
+            background: #e2e8f0;
+        }
+
+        .quick-btn.primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .quick-btn.danger {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
         /* PAGE */
         .page {
             display: none;
@@ -197,6 +226,19 @@
         .emp-hours {
             font-size: 0.8rem;
             color: #64748b;
+        }
+
+        .mesai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ecfdf3;
+            color: #15803d;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            margin-left: 6px;
         }
 
         .puantaj-inputs {
@@ -350,6 +392,47 @@
             font-size: 0.85rem;
         }
 
+        /* Report */
+        .report-item {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            cursor: pointer;
+        }
+
+        .report-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .report-detail {
+            display: none;
+            margin-top: 10px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+
+        .report-detail.show {
+            display: block;
+        }
+
+        .report-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .report-row:last-child {
+            border-bottom: none;
+        }
+
         /* ADD BUTTON */
         .add-btn {
             position: fixed;
@@ -468,6 +551,13 @@
             </div>
         </div>
 
+        <div class="quick-actions">
+            <button class="quick-btn primary" onclick="setAllDefaultShift()">Tümü 08:00 - 17:00</button>
+            <button class="quick-btn" onclick="setAllMesai(2)">Tümü +2 mesai</button>
+            <button class="quick-btn danger" onclick="setAllOff()">Tümünü İzinli Yap</button>
+            <button class="quick-btn" onclick="copyYesterday()">Dünü kopyala</button>
+        </div>
+
         <div class="puantaj-list" id="puantajList"></div>
 
         <div class="mesai-summary" id="mesaiSummary" style="display:none">
@@ -516,6 +606,8 @@
         let currentDate = new Date();
         let currentPage = 'puantaj';
         let saveTimeout;
+
+        const DEFAULT_RECORD = { start: '', end: '', mesai: 0, off: false };
 
         const DB_NAME = 'VardiyaDB2';
 
@@ -585,7 +677,7 @@
         // Tarih değiştir
         function changeDate(delta) {
             currentDate.setDate(currentDate.getDate() + delta);
-            renderPuantaj();
+            renderPuantaj(true);
         }
 
         // Sayfa göster
@@ -636,12 +728,14 @@
         }
 
         // Puantaj Güncelle
+        function ensureDayRecord(dateKey, empId) {
+            if (!records[dateKey]) records[dateKey] = {};
+            if (!records[dateKey][empId]) records[dateKey][empId] = { ...DEFAULT_RECORD };
+        }
+
         function updateRecord(empId, field, value) {
             const dateKey = formatDate(currentDate);
-            if (!records[dateKey]) records[dateKey] = {};
-            if (!records[dateKey][empId]) {
-                records[dateKey][empId] = { start: '08:00', end: '17:00', mesai: 0, off: false };
-            }
+            ensureDayRecord(dateKey, empId);
             
             if (field === 'off') {
                 records[dateKey][empId].off = value;
@@ -655,8 +749,72 @@
             saveData();
         }
 
+        function setAllDefaultShift() {
+            const dateKey = formatDate(currentDate);
+            const namedEmployees = employees.filter(e => e.name.trim());
+            if (!records[dateKey]) records[dateKey] = {};
+            namedEmployees.forEach(emp => {
+                records[dateKey][emp.id] = { start: '08:00', end: '17:00', mesai: 0, off: false };
+            });
+            renderPuantaj();
+            saveData();
+        }
+
+        function setAllMesai(hours = 2) {
+            const dateKey = formatDate(currentDate);
+            const namedEmployees = employees.filter(e => e.name.trim());
+            if (!records[dateKey]) records[dateKey] = {};
+            namedEmployees.forEach(emp => {
+                const existing = records[dateKey][emp.id] || { ...DEFAULT_RECORD };
+                records[dateKey][emp.id] = {
+                    start: existing.start || '08:00',
+                    end: existing.end || '17:00',
+                    mesai: Math.max(0, hours),
+                    off: false
+                };
+            });
+            renderPuantaj();
+            saveData();
+        }
+
+        function setAllOff() {
+            const dateKey = formatDate(currentDate);
+            const namedEmployees = employees.filter(e => e.name.trim());
+            if (!records[dateKey]) records[dateKey] = {};
+            namedEmployees.forEach(emp => {
+                records[dateKey][emp.id] = { start: '', end: '', mesai: 0, off: true };
+            });
+            renderPuantaj();
+            saveData();
+        }
+
+        function copyYesterday() {
+            const prev = new Date(currentDate);
+            prev.setDate(prev.getDate() - 1);
+            const prevKey = formatDate(prev);
+            const todayKey = formatDate(currentDate);
+            const namedEmployees = employees.filter(e => e.name.trim());
+
+            if (!records[prevKey]) {
+                alert('Dün için kayıt yok.');
+                return;
+            }
+
+            if (!records[todayKey]) records[todayKey] = {};
+
+            namedEmployees.forEach(emp => {
+                const rec = records[prevKey][emp.id];
+                if (rec) {
+                    records[todayKey][emp.id] = { ...rec };
+                }
+            });
+
+            renderPuantaj();
+            saveData();
+        }
+
         // Puantaj Render
-        function renderPuantaj() {
+        function renderPuantaj(jumpDate = false) {
             const dateKey = formatDate(currentDate);
             const today = formatDate(new Date());
             
@@ -681,7 +839,7 @@
             const dayRecords = records[dateKey] || {};
             
             container.innerHTML = namedEmployees.map(emp => {
-                const rec = dayRecords[emp.id] || { start: '08:00', end: '17:00', mesai: 0, off: false };
+                const rec = dayRecords[emp.id] || { ...DEFAULT_RECORD };
                 const isOff = rec.off;
                 const hasMesai = rec.mesai > 0;
                 
@@ -690,36 +848,39 @@
                 else if (hasMesai) cardClass += ' mesai';
                 else cardClass += ' worked';
                 
-                const hours = isOff ? 0 : calcHours(rec.start, rec.end) + rec.mesai;
+                const baseHours = (rec.start && rec.end) ? calcHours(rec.start, rec.end) : 0;
+                const hours = isOff ? 0 : baseHours + (rec.mesai || 0);
                 
                 return `
                     <div class="${cardClass}">
                         <div class="emp-info">
                             <div class="emp-name">${emp.name}</div>
-                            <div class="emp-hours">${isOff ? 'İzinli' : hours.toFixed(1) + ' saat'}</div>
+                            <div class="emp-hours">${isOff ? 'İzinli' : hours.toFixed(1) + ' saat'} ${hasMesai ? `<span class="mesai-badge">+${rec.mesai} mesai</span>` : ''}</div>
                         </div>
-                        <div class="puantaj-inputs">
+                           <div class="puantaj-inputs">
                             <input type="time" class="time-input" value="${rec.start}" 
-                                   ${isOff ? 'disabled' : ''}
-                                   onchange="updateRecord(${emp.id}, 'start', this.value)">
+                                placeholder="Giriş"
+                                ${isOff ? 'disabled' : ''}
+                                onchange="updateRecord(${emp.id}, 'start', this.value)">
                             <input type="time" class="time-input" value="${rec.end}" 
-                                   ${isOff ? 'disabled' : ''}
-                                   onchange="updateRecord(${emp.id}, 'end', this.value)">
+                                placeholder="Çıkış"
+                                ${isOff ? 'disabled' : ''}
+                                onchange="updateRecord(${emp.id}, 'end', this.value)">
                             <input type="number" class="mesai-input" value="${rec.mesai}" min="0" max="12"
-                                   placeholder="M" ${isOff ? 'disabled' : ''}
-                                   onchange="updateRecord(${emp.id}, 'mesai', this.value)">
+                                placeholder="Mesai" ${isOff ? 'disabled' : ''}
+                                onchange="updateRecord(${emp.id}, 'mesai', this.value)">
                             <button class="off-btn ${isOff ? 'active' : ''}" 
-                                    onclick="updateRecord(${emp.id}, 'off', ${!isOff})">
+                                 onclick="updateRecord(${emp.id}, 'off', ${!isOff})">
                                 ${isOff ? '✓ İzin' : 'İzin'}
                             </button>
-                        </div>
+                           </div>
                     </div>
                 `;
             }).join('');
 
             updateSummary(namedEmployees.map(emp => ({
                 ...emp,
-                ...(dayRecords[emp.id] || { start: '08:00', end: '17:00', mesai: 0, off: false })
+                ...(dayRecords[emp.id] || { ...DEFAULT_RECORD })
             })));
         }
 
@@ -737,7 +898,8 @@
             
             let totalHours = 0;
             working.forEach(d => {
-                totalHours += calcHours(d.start, d.end) + (d.mesai || 0);
+                const base = (d.start && d.end) ? calcHours(d.start, d.end) : 0;
+                totalHours += base + (d.mesai || 0);
             });
 
             document.getElementById('workingCount').textContent = working.length;
@@ -810,24 +972,38 @@
                 let totalHours = 0;
                 let totalMesai = 0;
                 let workDays = 0;
+                const daily = [];
                 
                 Object.keys(records).forEach(dateKey => {
                     const date = new Date(dateKey);
                     if (date.getFullYear() === year && date.getMonth() === month) {
-                        const rec = records[dateKey][emp.id];
-                        if (rec && !rec.off) {
-                            workDays++;
-                            totalHours += calcHours(rec.start, rec.end);
-                            totalMesai += rec.mesai || 0;
+                        const rec = records[dateKey]?.[emp.id];
+                        if (rec) {
+                            const base = (rec.start && rec.end && !rec.off) ? calcHours(rec.start, rec.end) : 0;
+                            const mesai = rec.off ? 0 : (rec.mesai || 0);
+                            const dayHours = rec.off ? 0 : base + mesai;
+                            if (!rec.off && (rec.start || rec.end || mesai > 0)) workDays++;
+                            totalHours += dayHours;
+                            totalMesai += mesai;
+                            daily.push({
+                                dateKey,
+                                dateText: date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', weekday: 'short' }),
+                                off: rec.off,
+                                base: base,
+                                mesai: mesai,
+                                total: dayHours
+                            });
                         }
                     }
                 });
+                daily.sort((a, b) => new Date(a.dateKey) - new Date(b.dateKey));
                 
                 return {
                     name: emp.name,
                     workDays,
-                    totalHours: totalHours + totalMesai,
-                    totalMesai
+                    totalHours: totalHours,
+                    totalMesai,
+                    daily
                 };
             });
 
@@ -835,19 +1011,38 @@
 
             container.innerHTML = `
                 <div class="section-title">${monthName}</div>
-                ${monthlyData.map(d => `
-                    <div class="employee-item">
-                        <div class="emp-info" style="flex:1">
-                            <div class="emp-name">${d.name}</div>
-                            <div class="emp-hours">${d.workDays} gün çalıştı</div>
+                ${monthlyData.map((d, idx) => `
+                    <div class="report-item" onclick="toggleReportDetail(${idx})">
+                        <div class="report-header">
+                            <div>
+                                <div class="emp-name">${d.name}</div>
+                                <div class="emp-hours">${d.workDays} gün çalıştı</div>
+                            </div>
+                            <div style="text-align:right">
+                                <div style="font-weight:700;color:#2563eb">${d.totalHours.toFixed(1)} saat</div>
+                                ${d.totalMesai > 0 ? `<div style="font-size:0.75rem;color:#10b981">+${d.totalMesai} mesai</div>` : ''}
+                            </div>
                         </div>
-                        <div style="text-align:right">
-                            <div style="font-weight:700;color:#2563eb">${d.totalHours.toFixed(1)} saat</div>
-                            ${d.totalMesai > 0 ? `<div style="font-size:0.75rem;color:#10b981">+${d.totalMesai} mesai</div>` : ''}
+                        <div class="report-detail" id="reportDetail-${idx}">
+                            ${d.daily.length === 0 ? '<div class="report-row">Kayıt yok</div>' : d.daily.map(r => `
+                                <div class="report-row">
+                                    <span>${r.dateText}</span>
+                                    <span>${r.off ? 'İzinli' : `${r.total.toFixed(1)} saat${r.mesai > 0 ? ' (+'+r.mesai+' mesai)' : ''}`}</span>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                 `).join('')}
             `;
+
+            window.__monthlyData = monthlyData;
+        }
+
+        function toggleReportDetail(idx) {
+            const el = document.getElementById('reportDetail-' + idx);
+            if (el) {
+                el.classList.toggle('show');
+            }
         }
 
         // Başlat
