@@ -274,6 +274,19 @@
             border-color: #10b981;
         }
 
+        .mesai-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #ecfdf3;
+            color: #15803d;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: 1px solid #bbf7d0;
+        }
+
         .mesai-input:focus {
             outline: none;
         }
@@ -906,9 +919,12 @@
                                 placeholder="Çıkış"
                                 ${isOff ? 'disabled' : ''}
                                 onchange="updateRecord(${emp.id}, 'end', this.value)">
-                            <input type="number" class="mesai-input" value="${rec.mesai}" min="0" max="12"
-                                placeholder="Mesai" ${isOff ? 'disabled' : ''}
-                                onchange="updateRecord(${emp.id}, 'mesai', this.value)">
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <span class="mesai-chip">Mesai</span>
+                                <input type="number" class="mesai-input" value="${rec.mesai}" min="0" max="12"
+                                    placeholder="Saat" ${isOff ? 'disabled' : ''}
+                                    onchange="updateRecord(${emp.id}, 'mesai', this.value)">
+                            </div>
                             <button class="off-btn ${isOff ? 'active' : ''}" 
                                  onclick="updateRecord(${emp.id}, 'off', ${!isOff})">
                                 ${isOff ? '✓ İzin' : 'İzin'}
