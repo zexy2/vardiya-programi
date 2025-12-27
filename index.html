@@ -841,6 +841,12 @@
             const id = Date.now();
             employees.push({ id, name: '' });
             dirtyEmployees.add(id);
+
+            // Yeni çalışanı bugünün varsayılan vardiyasıyla başlat
+            const dateKey = formatDate(currentDate);
+            if (!records[dateKey]) records[dateKey] = {};
+            records[dateKey][id] = { start: '07:00', end: '18:00', mesai: 0, off: false };
+
             renderEmployees();
             saveData();
             
