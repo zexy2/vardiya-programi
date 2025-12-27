@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Vardiya">
+    <meta name="theme-color" content="#667eea">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23667eea' width='100' height='100' rx='20'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='white'>📋</text></svg>">
+    <title>Vardiya Programı - Puantaj Takip</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .date-display {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .controls {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="date"] {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(235, 51, 73, 0.4);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: #667eea;
+        }
+
+        .stat-card p {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8f9ff;
+        }
+
+        tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        tr:nth-child(even):hover {
+            background: #f0f1ff;
+        }
+
+        input[type="text"], input[type="time"], input[type="number"] {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            width: 100%;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="time"]:focus, input[type="number"]:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .name-input {
+            min-width: 150px;
+        }
+
+        .time-input {
+            width: 100px;
+        }
+
+        .hours-input {
+            width: 70px;
+            text-align: center;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .mesai-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .mesai-var {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .mesai-yok {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .row-number {
+            font-weight: 700;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .add-employee {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .summary-section {
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .summary-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .mesai-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .mesai-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                padding-bottom: 80px;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            .controls-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .control-group {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .control-group button {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            table {
+                font-size: 0.75rem;
+            }
+
+            th, td {
+                padding: 6px 3px;
+            }
+
+            th:nth-child(5), td:nth-child(5),
+            th:nth-child(8), td:nth-child(8) {
+                display: none;
+            }
+
+            .name-input {
+                min-width: 80px;
+                font-size: 0.85rem;
+            }
+
+            .time-input {
+                width: 70px;
+                font-size: 0.85rem;
+            }
+
+            .hours-input {
+                width: 50px;
+            }
+
+            .stat-card {
+                padding: 15px 10px;
+            }
+
+            .stat-card h3 {
+                font-size: 1.5rem;
+            }
+
+            .mesai-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .install-prompt {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+        }
+
+        .install-prompt button {
+            margin-left: 15px;
+            background: white;
+            color: #11998e;
+        }
+
+        .install-prompt .close-btn {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            margin-left: 10px;
+        }
+
+        .print-only {
+            display: none;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 10px;
+            }
+
+            .controls, .add-employee, .btn-small, .action-buttons, .install-prompt {
+                display: none !important;
+            }
+
+            .table-container {
+                box-shadow: none;
+            }
+
+            .print-only {
+                display: block;
+            }
+
+            h1 {
+                color: #333;
+                text-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Vardiya Programı</h1>
+        <div class="date-display" id="currentDate"></div>
+
+        <div class="controls">
+            <div class="controls-row">
+                <div class="control-group">
+                    <label for="selectedDate">Tarih:</label>
+                    <input type="date" id="selectedDate">
+                </div>
+                <div class="control-group">
+                    <button class="btn-success" onclick="saveToFile()">💾 Dosyaya Kaydet</button>
+                    <button class="btn-primary" onclick="document.getElementById('loadFile').click()">📂 Dosya Yükle</button>
+                    <input type="file" id="loadFile" accept=".json" style="display:none" onchange="loadFromFile(event)">
+                    <button class="btn-primary" onclick="exportData()">📄 Rapor Al</button>
+                    <button class="btn-primary" onclick="window.print()">🖨️ Yazdır</button>
+                    <button class="btn-danger" onclick="clearAll()">🗑️ Temizle</button>
+                </div>
+            </div>
+            <div style="margin-top: 15px; padding: 10px; background: #e8f5e9; border-radius: 8px; color: #2e7d32;">
+                💡 <strong>Önemli:</strong> Değişiklik yaptıktan sonra "Dosyaya Kaydet" butonuna basın. Programı tekrar açtığınızda "Dosya Yükle" ile verilerinizi geri yükleyin.
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="totalEmployees">0</h3>
+                <p>Toplam Çalışan</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="workingToday">0</h3>
+                <p>Bugün Çalışan</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="onOvertime">0</h3>
+                <p>Mesaide Kalan</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalHours">0</h3>
+                <p>Toplam Saat</p>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Ad Soyad</th>
+                        <th style="width: 110px;">Giriş Saati</th>
+                        <th style="width: 110px;">Çıkış Saati</th>
+                        <th style="width: 90px;">Çalışma Süresi</th>
+                        <th style="width: 80px;">Mesai</th>
+                        <th style="width: 100px;">Mesai Saat</th>
+                        <th style="width: 120px;">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTable">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="add-employee">
+            <button class="btn-success" onclick="addEmployee()">➕ Yeni Çalışan Ekle</button>
+        </div>
+
+        <div class="summary-section">
+            <h2>📊 Mesaiye Kalanlar</h2>
+            <div class="mesai-list" id="mesaiList">
+                <p style="color: #666;">Mesaiye kalan çalışan yok</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Uygulama Kurulum Banner'ı -->
+    <div class="install-prompt" id="installPrompt">
+        📲 Uygulamayı telefonunuza kurun!
+        <button onclick="installApp()">Kur</button>
+        <button class="close-btn" onclick="hideInstallPrompt()">✕</button>
+    </div>
+
+    <script>
+        let employees = [];
+        let employeeCounter = 0;
+        let deferredPrompt;
+        const DB_NAME = 'VardiyaDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'employees';
+
+        // IndexedDB açma
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    }
+                };
+            });
+        }
+
+        // Veritabanına kaydet (otomatik)
+        async function saveToDatabase() {
+            try {
+                const db = await openDB();
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                
+                // Önce temizle
+                store.clear();
+                
+                // Tüm verileri kaydet
+                const data = {
+                    id: 'main',
+                    employees: employees,
+                    counter: employeeCounter,
+                    date: document.getElementById('selectedDate').value,
+                    savedAt: new Date().toISOString()
+                };
+                store.put(data);
+                
+                await new Promise((resolve, reject) => {
+                    tx.oncomplete = resolve;
+                    tx.onerror = reject;
+                });
+                
+                console.log('✅ Otomatik kaydedildi');
+            } catch (err) {
+                console.error('Kaydetme hatası:', err);
+            }
+        }
+
+        // Veritabanından yükle
+        async function loadFromDatabase() {
+            try {
+                const db = await openDB();
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.get('main');
+                
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            } catch (err) {
+                console.error('Yükleme hatası:', err);
+                return null;
+            }
+        }
+
+        // Service Worker ve PWA kurulumu
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker kayıtlı'))
+                .catch(err => console.log('SW hatası:', err));
+        }
+
+        // PWA kurulum eventi
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPrompt').style.display = 'block';
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choice) => {
+                    if (choice.outcome === 'accepted') {
+                        console.log('Uygulama kuruldu');
+                    }
+                    deferredPrompt = null;
+                    hideInstallPrompt();
+                });
+            }
+        }
+
+        function hideInstallPrompt() {
+            document.getElementById('installPrompt').style.display = 'none';
+        }
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Bugünün tarihini ayarla
+            const today = new Date();
+            document.getElementById('selectedDate').value = today.toISOString().split('T')[0];
+            updateDateDisplay();
+
+            // Kayıtlı veriyi yükle (IndexedDB'den)
+            const savedData = await loadFromDatabase();
+            
+            if (savedData && savedData.employees && savedData.employees.length > 0) {
+                employees = savedData.employees;
+                employeeCounter = savedData.counter || employees.length;
+                if (savedData.date) {
+                    document.getElementById('selectedDate').value = savedData.date;
+                    updateDateDisplay();
+                }
+                renderTable();
+                updateStats();
+                console.log('✅ Veriler yüklendi, son kayıt:', savedData.savedAt);
+            } else {
+                // Boş başla
+                loadData();
+            }
+        });
+
+        function updateDateDisplay() {
+            const date = new Date(document.getElementById('selectedDate').value);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = date.toLocaleDateString('tr-TR', options);
+        }
+
+        document.getElementById('selectedDate').addEventListener('change', function() {
+            updateDateDisplay();
+            loadData();
+        });
+
+        function addEmployee() {
+            employeeCounter++;
+            const employee = {
+                id: employeeCounter,
+                name: '',
+                startTime: '08:00',
+                endTime: '17:00',
+                overtime: false,
+                overtimeHours: 0
+            };
+            employees.push(employee);
+            renderTable();
+            updateStats();
+            saveToDatabase(); // Otomatik kaydet
+        }
+
+        function removeEmployee(id) {
+            employees = employees.filter(emp => emp.id !== id);
+            renderTable();
+            updateStats();
+            saveToDatabase(); // Otomatik kaydet
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('employeeTable');
+            tbody.innerHTML = '';
+
+            employees.forEach((emp, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="row-number">${index + 1}</td>
+                    <td>
+                        <input type="text" class="name-input" value="${emp.name}" 
+                               onchange="updateEmployee(${emp.id}, 'name', this.value)"
+                               placeholder="Çalışan adı">
+                    </td>
+                    <td>
+                        <input type="time" class="time-input" value="${emp.startTime}" 
+                               onchange="updateEmployee(${emp.id}, 'startTime', this.value)">
+                    </td>
+                    <td>
+                        <input type="time" class="time-input" value="${emp.endTime}" 
+                               onchange="updateEmployee(${emp.id}, 'endTime', this.value)">
+                    </td>
+                    <td style="text-align: center;">
+                        <strong>${calculateWorkHours(emp.startTime, emp.endTime)}</strong> saat
+                    </td>
+                    <td class="checkbox-container">
+                        <input type="checkbox" ${emp.overtime ? 'checked' : ''} 
+                               onchange="updateEmployee(${emp.id}, 'overtime', this.checked)">
+                    </td>
+                    <td>
+                        <input type="number" class="hours-input" value="${emp.overtimeHours}" min="0" max="12"
+                               onchange="updateEmployee(${emp.id}, 'overtimeHours', this.value)"
+                               ${emp.overtime ? '' : 'disabled'}>
+                    </td>
+                    <td class="action-buttons">
+                        <button class="btn-danger btn-small" onclick="removeEmployee(${emp.id})">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateEmployee(id, field, value) {
+            const emp = employees.find(e => e.id === id);
+            if (emp) {
+                if (field === 'overtimeHours') {
+                    emp[field] = parseInt(value) || 0;
+                } else {
+                    emp[field] = value;
+                }
+                
+                if (field === 'overtime' && !value) {
+                    emp.overtimeHours = 0;
+                }
+                
+                renderTable();
+                updateStats();
+                updateMesaiList();
+                saveToDatabase(); // Otomatik kaydet
+            }
+        }
+
+        function calculateWorkHours(start, end) {
+            if (!start || !end) return 0;
+            const [startH, startM] = start.split(':').map(Number);
+            const [endH, endM] = end.split(':').map(Number);
+            const diff = (endH * 60 + endM) - (startH * 60 + startM);
+            return Math.max(0, (diff / 60)).toFixed(1);
+        }
+
+        function updateStats() {
+            const total = employees.length;
+            const working = employees.filter(emp => emp.name.trim() !== '').length;
+            const overtime = employees.filter(emp => emp.overtime && emp.name.trim() !== '').length;
+            
+            let totalHours = 0;
+            employees.forEach(emp => {
+                if (emp.name.trim() !== '') {
+                    totalHours += parseFloat(calculateWorkHours(emp.startTime, emp.endTime)) || 0;
+                    totalHours += emp.overtimeHours || 0;
+                }
+            });
+
+            document.getElementById('totalEmployees').textContent = total;
+            document.getElementById('workingToday').textContent = working;
+            document.getElementById('onOvertime').textContent = overtime;
+            document.getElementById('totalHours').textContent = totalHours.toFixed(1);
+
+            updateMesaiList();
+        }
+
+        function updateMesaiList() {
+            const mesaiList = document.getElementById('mesaiList');
+            const overtimeEmployees = employees.filter(emp => emp.overtime && emp.name.trim() !== '');
+
+            if (overtimeEmployees.length === 0) {
+                mesaiList.innerHTML = '<p style="color: #666;">Mesaiye kalan çalışan yok</p>';
+                return;
+            }
+
+            mesaiList.innerHTML = overtimeEmployees.map(emp => `
+                <div class="mesai-item">
+                    <span>${emp.name}</span>
+                    <span>${emp.overtimeHours} saat</span>
+                </div>
+            `).join('');
+        }
+
+        function saveToFile() {
+            const date = document.getElementById('selectedDate').value;
+            const data = {
+                date: date,
+                employees: employees,
+                counter: employeeCounter,
+                savedAt: new Date().toLocaleString('tr-TR')
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `vardiya_verileri.json`;
+            link.click();
+            
+            alert('✅ Veriler dosyaya kaydedildi!\n\n📁 "vardiya_verileri.json" dosyasını saklayın.\n\nProgramı tekrar açtığınızda "Dosya Yükle" butonuyla verilerinizi geri yükleyebilirsiniz.');
+        }
+
+        function loadFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    employees = data.employees || [];
+                    employeeCounter = data.counter || employees.length;
+                    
+                    if (data.date) {
+                        document.getElementById('selectedDate').value = data.date;
+                        updateDateDisplay();
+                    }
+                    
+                    renderTable();
+                    updateStats();
+                    
+                    alert('✅ Veriler başarıyla yüklendi!\n\nSon kayıt: ' + (data.savedAt || 'Bilinmiyor'));
+                } catch (err) {
+                    alert('❌ Dosya okunamadı! Geçerli bir vardiya dosyası seçin.');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // Reset input
+        }
+
+        function loadData() {
+            // Boş başla
+            employees = [];
+            employeeCounter = 0;
+            for (let i = 0; i < 30; i++) {
+                addEmployee();
+            }
+            
+            renderTable();
+            updateStats();
+        }
+
+        function clearAll() {
+            if (confirm('⚠️ Tüm verileri silmek istediğinizden emin misiniz?')) {
+                employees = [];
+                employeeCounter = 0;
+                for (let i = 0; i < 30; i++) {
+                    addEmployee();
+                }
+                updateStats();
+                saveData();
+            }
+        }
+
+        function exportData() {
+            const date = document.getElementById('selectedDate').value;
+            const workingEmployees = employees.filter(emp => emp.name.trim() !== '');
+            
+            let text = `VARDIYA PROGRAMI - ${date}\n`;
+            text += '='.repeat(50) + '\n\n';
+            
+            text += 'ÇALIŞAN LİSTESİ:\n';
+            text += '-'.repeat(50) + '\n';
+            
+            workingEmployees.forEach((emp, index) => {
+                text += `${index + 1}. ${emp.name}\n`;
+                text += `   Giriş: ${emp.startTime} - Çıkış: ${emp.endTime}\n`;
+                text += `   Çalışma: ${calculateWorkHours(emp.startTime, emp.endTime)} saat\n`;
+                if (emp.overtime) {
+                    text += `   ✓ Mesai: ${emp.overtimeHours} saat\n`;
+                }
+                text += '\n';
+            });
+
+            const overtimeEmployees = workingEmployees.filter(emp => emp.overtime);
+            if (overtimeEmployees.length > 0) {
+                text += '\nMESAİYE KALANLAR:\n';
+                text += '-'.repeat(50) + '\n';
+                overtimeEmployees.forEach(emp => {
+                    text += `• ${emp.name}: ${emp.overtimeHours} saat mesai\n`;
+                });
+            }
+
+            text += '\n' + '='.repeat(50) + '\n';
+            text += `Toplam Çalışan: ${workingEmployees.length}\n`;
+            text += `Mesaiye Kalan: ${overtimeEmployees.length}\n`;
+
+            // Dosya olarak indir
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `vardiya_${date}.txt`;
+            link.click();
+        }
+    </script>
+</body>
+</html>
