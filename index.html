@@ -377,6 +377,7 @@
             font-weight: 500;
             padding: 8px 0;
             border-bottom: 2px solid #e2e8f0;
+            color: #0f172a;
         }
 
         .employee-input:focus {
@@ -393,6 +394,26 @@
             background: #2563eb;
             color: white;
             box-shadow: 0 2px 8px rgba(37,99,235,0.2);
+        }
+
+        .status-badge {
+            background: #ecfdf3;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .edit-btn {
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #0f172a;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-weight: 700;
+            cursor: pointer;
         }
 
         .delete-btn {
@@ -722,6 +743,8 @@
         let currentDate = new Date();
         let currentPage = 'puantaj';
         let saveTimeout;
+        const dirtyEmployees = new Set();
+        const savedFlash = new Set();
 
         const DEFAULT_RECORD = { start: '', end: '', mesai: 0, off: false };
         let deferredPrompt = null;
@@ -817,6 +840,7 @@
         function addEmployee() {
             const id = Date.now();
             employees.push({ id, name: '' });
+            dirtyEmployees.add(id);
             renderEmployees();
             saveData();
             
@@ -840,7 +864,14 @@
             const emp = employees.find(e => e.id === id);
             if (emp) {
                 emp.name = name;
+                dirtyEmployees.delete(id);
+                savedFlash.add(id);
                 saveData();
+                renderEmployees();
+                setTimeout(() => {
+                    savedFlash.delete(id);
+                    renderEmployees();
+                }, 1800);
             }
         }
 
@@ -849,6 +880,19 @@
             if (!input) return;
             updateEmployeeName(id, input.value.trim());
             input.blur();
+        }
+
+        function markDirty(id) {
+            dirtyEmployees.add(id);
+        }
+
+        function startEdit(id) {
+            dirtyEmployees.add(id);
+            renderEmployees();
+            setTimeout(() => {
+                const input = document.querySelector(`[data-emp-id="${id}"] .employee-input`);
+                if (input) input.focus();
+            }, 30);
         }
 
         // Puantaj Güncelle
@@ -1069,8 +1113,15 @@
                         <div class="employee-num">${i + 1}</div>
                         <input type="text" class="employee-input" value="${emp.name}" 
                                placeholder="İsim girin..."
-                               onchange="updateEmployeeName(${emp.id}, this.value)">
-                        <button class="save-btn" onclick="saveEmployeeName(${emp.id})">Kaydet</button>
+                               oninput="markDirty(${emp.id})">
+                        ${dirtyEmployees.has(emp.id) ? `
+                            <button class="save-btn" onclick="saveEmployeeName(${emp.id})">Kaydet</button>
+                        ` : savedFlash.has(emp.id) ? `
+                            <span class="status-badge">Kaydedildi</span>
+                            <button class="edit-btn" onclick="startEdit(${emp.id})">Düzenle</button>
+                        ` : `
+                            <button class="edit-btn" onclick="startEdit(${emp.id})">Düzenle</button>
+                        `}
                         <button class="delete-btn" onclick="deleteEmployee(${emp.id})">🗑️</button>
                     </div>
                 `).join('')}
