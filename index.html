@@ -192,6 +192,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 12px;
         }
 
@@ -210,7 +211,7 @@
         }
 
         .emp-info {
-            flex: 1;
+            flex: 1 1 100%;
             min-width: 0;
         }
 
@@ -244,12 +245,14 @@
         .puantaj-inputs {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .time-input {
-            width: 70px;
-            padding: 8px 4px;
+            width: 84px;
+            padding: 9px 6px;
             border: 2px solid #e2e8f0;
             border-radius: 8px;
             text-align: center;
@@ -292,10 +295,10 @@
         }
 
         .off-btn {
-            padding: 8px 10px;
+            padding: 7px 8px;
             border: none;
             border-radius: 8px;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             cursor: pointer;
             background: #fee2e2;
             color: #dc2626;
@@ -309,6 +312,30 @@
         /* EMPLOYEE MANAGEMENT */
         .employee-section {
             padding: 15px;
+        }
+
+        .employee-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 0 15px 10px 15px;
+        }
+
+        .add-inline-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .employee-hint {
+            color: #64748b;
+            font-size: 0.9rem;
         }
 
         .section-title {
@@ -355,6 +382,17 @@
         .employee-input:focus {
             outline: none;
             border-bottom-color: #2563eb;
+        }
+
+        .save-btn {
+            border: none;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.2);
         }
 
         .delete-btn {
@@ -444,6 +482,23 @@
 
         .report-row:last-child {
             border-bottom: none;
+        }
+
+        .report-actions {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0 15px 10px 15px;
+        }
+
+        .download-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
 
         /* ADD BUTTON */
@@ -598,7 +653,7 @@
         </div>
 
         <div class="quick-actions">
-            <button class="quick-btn primary" onclick="setAllDefaultShift()">Tümü 08:00 - 17:00</button>
+            <button class="quick-btn primary" onclick="setAllDefaultShift()">Tümü 07:00 - 18:00</button>
             <button class="quick-btn" onclick="setAllMesai(2)">Tümü +2 mesai</button>
             <button class="quick-btn danger" onclick="setAllOff()">Tümünü İzinli Yap</button>
             <button class="quick-btn" onclick="copyYesterday()">Dünü kopyala</button>
@@ -622,6 +677,11 @@
             💡 Çalışanları buraya bir kez ekleyin. Her gün puantaj sekmesinde otomatik görünecekler.
         </div>
 
+        <div class="employee-actions">
+            <button class="add-inline-btn" onclick="addEmployee()">➕ Çalışan ekle</button>
+            <span class="employee-hint">İsmi yazıp Kaydet'e dokunun</span>
+        </div>
+
         <div class="employee-section" id="employeeSection"></div>
     </div>
 
@@ -633,6 +693,10 @@
 
         <div class="info-box">
             📅 Bu ay çalışanların toplam çalışma saatleri
+        </div>
+
+        <div class="report-actions">
+            <button class="download-btn" onclick="exportReportPDF()">Detaylı PDF indir</button>
         </div>
 
         <div class="employee-section" id="reportSection"></div>
@@ -742,7 +806,7 @@
             document.getElementById(page + 'Page').classList.add('active');
             document.querySelector(`.tab[onclick="showPage('${page}')"]`).classList.add('active');
             
-            document.getElementById('addBtn').style.display = page === 'employees' ? 'flex' : 'none';
+            document.getElementById('addBtn').style.display = 'none';
             
             if (page === 'puantaj') renderPuantaj();
             else if (page === 'employees') renderEmployees();
@@ -780,6 +844,13 @@
             }
         }
 
+        function saveEmployeeName(id) {
+            const input = document.querySelector(`[data-emp-id="${id}"] .employee-input`);
+            if (!input) return;
+            updateEmployeeName(id, input.value.trim());
+            input.blur();
+        }
+
         // Puantaj Güncelle
         function ensureDayRecord(dateKey, empId) {
             if (!records[dateKey]) records[dateKey] = {};
@@ -807,7 +878,7 @@
             const namedEmployees = employees.filter(e => e.name.trim());
             if (!records[dateKey]) records[dateKey] = {};
             namedEmployees.forEach(emp => {
-                records[dateKey][emp.id] = { start: '08:00', end: '17:00', mesai: 0, off: false };
+                records[dateKey][emp.id] = { start: '07:00', end: '18:00', mesai: 0, off: false };
             });
             renderPuantaj();
             saveData();
@@ -820,8 +891,8 @@
             namedEmployees.forEach(emp => {
                 const existing = records[dateKey][emp.id] || { ...DEFAULT_RECORD };
                 records[dateKey][emp.id] = {
-                    start: existing.start || '08:00',
-                    end: existing.end || '17:00',
+                    start: existing.start || '07:00',
+                    end: existing.end || '18:00',
                     mesai: Math.max(0, hours),
                     off: false
                 };
@@ -999,6 +1070,7 @@
                         <input type="text" class="employee-input" value="${emp.name}" 
                                placeholder="İsim girin..."
                                onchange="updateEmployeeName(${emp.id}, this.value)">
+                        <button class="save-btn" onclick="saveEmployeeName(${emp.id})">Kaydet</button>
                         <button class="delete-btn" onclick="deleteEmployee(${emp.id})">🗑️</button>
                     </div>
                 `).join('')}
@@ -1099,6 +1171,71 @@
             if (el) {
                 el.classList.toggle('show');
             }
+        }
+
+        function ensureReportData() {
+            if (!window.__monthlyData) {
+                renderReport();
+            }
+            return window.__monthlyData || [];
+        }
+
+        function exportReportPDF() {
+            const data = ensureReportData();
+            const now = new Date();
+            const monthName = now.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
+
+            const popup = window.open('', '_blank');
+            if (!popup) {
+                alert('Açılır pencere engellendi. Lütfen bu site için açılır pencere izni verin.');
+                return;
+            }
+
+            const style = `
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; color: #0f172a; }
+                    h1 { font-size: 20px; margin-bottom: 10px; }
+                    .meta { color: #475569; margin-bottom: 12px; }
+                    .emp-block { margin-bottom: 18px; }
+                    .emp-summary { font-weight: 700; margin-bottom: 6px; font-size: 14px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+                    th, td { border: 1px solid #e2e8f0; padding: 6px 8px; font-size: 12px; text-align: left; }
+                    th { background: #f8fafc; }
+                    tr:nth-child(even) { background: #f8fafc; }
+                    .no-data { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+                </style>
+            `;
+
+            const content = [`<h1>${monthName} Detaylı Rapor</h1>`, `<div class="meta">İndirilen tarih: ${new Date().toLocaleString('tr-TR')}</div>`];
+
+            if (data.length === 0) {
+                content.push('<div>Bu ay için kayıt yok.</div>');
+            } else {
+                data.forEach(d => {
+                    content.push(`<div class="emp-block">
+                        <div class="emp-summary">${d.name} — ${d.totalHours.toFixed(1)} saat ${d.totalMesai > 0 ? '(+' + d.totalMesai + ' mesai)' : ''} — ${d.workDays} gün</div>
+                        ${d.daily.length === 0 ? '<div class="no-data">Kayıt yok</div>' : `
+                        <table>
+                            <thead>
+                                <tr><th>Tarih</th><th>Durum</th><th>Saat</th></tr>
+                            </thead>
+                            <tbody>
+                                ${d.daily.map(r => `<tr>
+                                    <td>${r.dateText}</td>
+                                    <td>${r.off ? 'İzinli' : 'Çalıştı'}</td>
+                                    <td>${r.off ? '-' : `${r.total.toFixed(1)} saat${r.mesai > 0 ? ' (+' + r.mesai + ')' : ''}`}</td>
+                                </tr>`).join('')}
+                            </tbody>
+                        </table>
+                        `}
+                    </div>`);
+                });
+            }
+
+            popup.document.write(`<html><head><title>${monthName} Rapor</title>${style}</head><body>${content.join('')}</body></html>`);
+            popup.document.close();
+            popup.focus();
+            setTimeout(() => popup.print(), 300);
         }
 
         // Başlat
