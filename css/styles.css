@@ -1,0 +1,659 @@
+/**
+ * Vardiya Programı - Main Styles
+ * Employee Shift Tracking PWA
+ * 
+ * Structure:
+ * 1. Reset & Base
+ * 2. Layout
+ * 3. Components
+ * 4. Utilities
+ * 5. Responsive
+ */
+
+/* ===========================================
+   1. RESET & BASE STYLES
+   =========================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f0f4f8;
+    min-height: 100vh;
+    padding-bottom: 100px;
+}
+
+/* ===========================================
+   2. LAYOUT - Tabs & Header
+   =========================================== */
+
+.tabs {
+    display: flex;
+    background: white;
+    border-bottom: 2px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+}
+
+.tab {
+    flex: 1;
+    padding: 15px;
+    text-align: center;
+    font-weight: 600;
+    color: #64748b;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.tab.active {
+    color: #2563eb;
+    background: #eff6ff;
+    border-bottom: 3px solid #2563eb;
+    margin-bottom: -2px;
+}
+
+.header {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+}
+
+/* ===========================================
+   3. COMPONENTS
+   =========================================== */
+
+/* --- Date Selector --- */
+.date-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 15px;
+    background: white;
+    margin: 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.date-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: #e2e8f0;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.date-btn:active {
+    background: #cbd5e1;
+}
+
+.current-date {
+    text-align: center;
+    min-width: 180px;
+}
+
+.current-date .day {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.current-date .full {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+/* --- Summary Cards --- */
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 15px;
+    background: white;
+    margin: 15px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.summary-item {
+    text-align: center;
+    padding: 10px 5px;
+}
+
+.summary-item .number {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.summary-item .label {
+    font-size: 0.7rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* --- Quick Actions --- */
+.quick-actions {
+    display: flex;
+    gap: 8px;
+    padding: 0 15px 15px 15px;
+    flex-wrap: wrap;
+}
+
+.quick-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #0f172a;
+    background: #e2e8f0;
+}
+
+.quick-btn.primary {
+    background: #2563eb;
+    color: white;
+}
+
+.quick-btn.danger {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* --- Page Visibility --- */
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+/* --- Puantaj Cards --- */
+.puantaj-list {
+    padding: 0 15px;
+}
+
+.puantaj-card {
+    background: white;
+    border-radius: 12px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.puantaj-card.worked {
+    border-left: 4px solid #2563eb;
+}
+
+.puantaj-card.mesai {
+    border-left: 4px solid #10b981;
+    background: linear-gradient(to right, #f0fdf4, white);
+}
+
+.puantaj-card.off {
+    opacity: 0.5;
+    border-left: 4px solid #ef4444;
+}
+
+.emp-info {
+    flex: 1 1 100%;
+    min-width: 0;
+}
+
+.emp-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.emp-hours {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.mesai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #ecfdf3;
+    color: #15803d;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    margin-left: 6px;
+}
+
+/* --- Form Inputs --- */
+.puantaj-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.time-input {
+    width: 84px;
+    padding: 9px 6px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.time-input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.mesai-input {
+    width: 45px;
+    padding: 8px 4px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: #f0fdf4;
+    border-color: #10b981;
+}
+
+.mesai-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #ecfdf3;
+    color: #15803d;
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border: 1px solid #bbf7d0;
+}
+
+.mesai-input:focus {
+    outline: none;
+}
+
+.off-btn {
+    padding: 7px 8px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.off-btn.active {
+    background: #dc2626;
+    color: white;
+}
+
+/* --- Employee Management --- */
+.employee-section {
+    padding: 15px;
+}
+
+.employee-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 15px 10px 15px;
+}
+
+.add-inline-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.employee-hint {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.section-title {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 10px;
+    padding-left: 5px;
+}
+
+.employee-item {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.employee-num {
+    width: 30px;
+    height: 30px;
+    background: #2563eb;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.employee-input {
+    flex: 1 1 auto;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 8px 0;
+    border-bottom: 2px solid #e2e8f0;
+    color: #0f172a;
+    min-width: 160px;
+}
+
+.employee-input:focus {
+    outline: none;
+    border-bottom-color: #2563eb;
+}
+
+.save-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-weight: 700;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+    white-space: nowrap;
+}
+
+.status-badge {
+    background: #ecfdf3;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.edit-btn {
+    border: 1px solid #cbd5e1;
+    background: white;
+    color: #0f172a;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 5px;
+    opacity: 0.6;
+    margin-left: 6px;
+}
+
+/* --- Mesai Summary --- */
+.mesai-summary {
+    margin: 15px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 16px;
+    padding: 15px;
+    color: white;
+}
+
+.mesai-summary h2 {
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.mesai-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mesai-person {
+    display: flex;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.mesai-person .hours {
+    background: white;
+    color: #059669;
+    padding: 2px 10px;
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* --- Report Section --- */
+.report-item {
+    background: white;
+    border-radius: 12px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+}
+
+.report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.report-detail {
+    display: none;
+    margin-top: 10px;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 10px;
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.report-detail.show {
+    display: block;
+}
+
+.report-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.report-row:last-child {
+    border-bottom: none;
+}
+
+.report-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 15px 10px 15px;
+}
+
+.download-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+/* --- Floating Action Button --- */
+.add-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.8rem;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+    z-index: 100;
+}
+
+/* --- Save Status Toast --- */
+.save-status {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: #1e293b;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s;
+    z-index: 100;
+}
+
+.save-status.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.save-status .dot {
+    width: 6px;
+    height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+}
+
+/* --- PWA Install CTA --- */
+.install-cta {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2563eb;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+    display: none;
+    align-items: center;
+    gap: 10px;
+    z-index: 120;
+}
+
+.install-cta button {
+    background: white;
+    color: #2563eb;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.install-cta .later-btn {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* --- Empty State --- */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+}
+
+.empty-state .icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+/* --- Info Box --- */
+.info-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 12px 15px;
+    margin: 15px;
+    font-size: 0.85rem;
+    color: #1e40af;
+}
+
+/* ===========================================
+   4. RESPONSIVE
+   =========================================== */
+
+@media (min-width: 768px) {
+    .puantaj-list,
+    .employee-section,
+    .summary,
+    .mesai-summary,
+    .info-box {
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
