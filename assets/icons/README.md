@@ -2,16 +2,16 @@
 
 This folder should contain the following PNG icons for the PWA:
 
-| File | Size | Usage |
-|------|------|-------|
-| `icon-72x72.png` | 72×72 | Android small |
-| `icon-96x96.png` | 96×96 | Android medium |
+| File               | Size    | Usage            |
+| ------------------ | ------- | ---------------- |
+| `icon-72x72.png`   | 72×72   | Android small    |
+| `icon-96x96.png`   | 96×96   | Android medium   |
 | `icon-128x128.png` | 128×128 | Chrome Web Store |
-| `icon-144x144.png` | 144×144 | MS Tile |
-| `icon-152x152.png` | 152×152 | iOS |
-| `icon-192x192.png` | 192×192 | Android main |
-| `icon-384x384.png` | 384×384 | High-res |
-| `icon-512x512.png` | 512×512 | Splash screen |
+| `icon-144x144.png` | 144×144 | MS Tile          |
+| `icon-152x152.png` | 152×152 | iOS              |
+| `icon-192x192.png` | 192×192 | Android main     |
+| `icon-384x384.png` | 384×384 | High-res         |
+| `icon-512x512.png` | 512×512 | Splash screen    |
 
 ## Generating Icons
 

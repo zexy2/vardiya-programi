@@ -1,11 +1,11 @@
 /**
  * Vardiya Programı - Main Application
  * Employee Shift & Overtime Tracking PWA
- * 
+ *
  * @author Zeki Akgül
  * @version 1.0.0
  * @license MIT
- * 
+ *
  * Architecture:
  * - IndexedDB for persistent storage
  * - Service Worker for offline support
@@ -17,26 +17,26 @@
 // ===========================================
 
 const CONFIG = {
-    DB_NAME: 'VardiyaDB2',
+    DB_NAME: "VardiyaDB2",
     DB_VERSION: 1,
-    DEFAULT_SHIFT: { start: '07:00', end: '18:00' },
+    DEFAULT_SHIFT: { start: "07:00", end: "18:00" },
     MAX_MESAI_HOURS: 12,
-    SAVE_TOAST_DURATION: 1500
+    SAVE_TOAST_DURATION: 1500,
 };
 
 // Application State
 const state = {
-    employees: [],      // [{id: number, name: string}]
-    records: {},        // {"YYYY-MM-DD": {empId: {start, end, mesai, off}}}
+    employees: [], // [{id: number, name: string}]
+    records: {}, // {"YYYY-MM-DD": {empId: {start, end, mesai, off}}}
     currentDate: new Date(),
-    currentPage: 'puantaj',
+    currentPage: "puantaj",
     saveTimeout: null,
     dirtyEmployees: new Set(),
     savedFlash: new Set(),
-    deferredPrompt: null
+    deferredPrompt: null,
 };
 
-const DEFAULT_RECORD = { start: '', end: '', mesai: 0, off: false };
+const DEFAULT_RECORD = { start: "", end: "", mesai: 0, off: false };
 
 // ===========================================
 // DATABASE OPERATIONS
@@ -49,14 +49,14 @@ const DEFAULT_RECORD = { start: '', end: '', mesai: 0, off: false };
 function openDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
-        
+
         request.onerror = () => reject(request.error);
         request.onsuccess = () => resolve(request.result);
-        
+
         request.onupgradeneeded = (e) => {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains('data')) {
-                db.createObjectStore('data', { keyPath: 'id' });
+            if (!db.objectStoreNames.contains("data")) {
+                db.createObjectStore("data", { keyPath: "id" });
             }
         };
     });
@@ -68,15 +68,15 @@ function openDB() {
 async function saveData() {
     try {
         const db = await openDB();
-        const tx = db.transaction('data', 'readwrite');
-        const store = tx.objectStore('data');
-        
-        store.put({ id: 'employees', data: state.employees });
-        store.put({ id: 'records', data: state.records });
+        const tx = db.transaction("data", "readwrite");
+        const store = tx.objectStore("data");
+
+        store.put({ id: "employees", data: state.employees });
+        store.put({ id: "records", data: state.records });
 
         showSaveToast();
-    } catch (error) {
-        console.error('Save error:', error);
+    } catch {
+        // Silent fail - data will be saved on next attempt
     }
 }
 
@@ -86,13 +86,13 @@ async function saveData() {
 async function loadData() {
     try {
         const db = await openDB();
-        const tx = db.transaction('data', 'readonly');
-        const store = tx.objectStore('data');
+        const tx = db.transaction("data", "readonly");
+        const store = tx.objectStore("data");
 
-        const empReq = store.get('employees');
-        const recReq = store.get('records');
+        const empReq = store.get("employees");
+        const recReq = store.get("records");
 
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             tx.oncomplete = () => {
                 state.employees = empReq.result?.data || [];
                 state.records = recReq.result?.data || {};
@@ -100,8 +100,8 @@ async function loadData() {
             };
             tx.onerror = () => resolve();
         });
-    } catch (error) {
-        console.error('Load error:', error);
+    } catch {
+        // Silent fail - will use default empty state
     }
 }
 
@@ -111,23 +111,23 @@ async function loadData() {
 
 /**
  * Format date as ISO string (YYYY-MM-DD)
- * @param {Date} date 
+ * @param {Date} date
  * @returns {string}
  */
 function formatDate(date) {
-    return date.toISOString().split('T')[0];
+    return date.toISOString().split("T")[0];
 }
 
 /**
  * Format date in Turkish locale
- * @param {Date} date 
+ * @param {Date} date
  * @returns {string}
  */
 function formatDateTR(date) {
-    return date.toLocaleDateString('tr-TR', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long'
+    return date.toLocaleDateString("tr-TR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
     });
 }
 
@@ -139,8 +139,8 @@ function formatDateTR(date) {
  */
 function calcHours(start, end) {
     if (!start || !end) return 0;
-    const [sh, sm] = start.split(':').map(Number);
-    const [eh, em] = end.split(':').map(Number);
+    const [sh, sm] = start.split(":").map(Number);
+    const [eh, em] = end.split(":").map(Number);
     return Math.max(0, (eh * 60 + em - sh * 60 - sm) / 60);
 }
 
@@ -152,12 +152,12 @@ function calcHours(start, end) {
  * Show save status toast notification
  */
 function showSaveToast() {
-    const status = document.getElementById('saveStatus');
-    status.classList.add('show');
-    
+    const status = document.getElementById("saveStatus");
+    status.classList.add("show");
+
     clearTimeout(state.saveTimeout);
     state.saveTimeout = setTimeout(() => {
-        status.classList.remove('show');
+        status.classList.remove("show");
     }, CONFIG.SAVE_TOAST_DURATION);
 }
 
@@ -176,21 +176,27 @@ function changeDate(delta) {
  */
 function showPage(page) {
     state.currentPage = page;
-    
+
     // Update page visibility
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    
-    document.getElementById(page + 'Page').classList.add('active');
-    document.querySelector(`.tab[onclick="showPage('${page}')"]`).classList.add('active');
-    
+    document
+        .querySelectorAll(".page")
+        .forEach((p) => p.classList.remove("active"));
+    document
+        .querySelectorAll(".tab")
+        .forEach((t) => t.classList.remove("active"));
+
+    document.getElementById(page + "Page").classList.add("active");
+    document
+        .querySelector(`.tab[onclick="showPage('${page}')"]`)
+        .classList.add("active");
+
     // Hide floating button on non-employee pages
-    document.getElementById('addBtn').style.display = 'none';
-    
+    document.getElementById("addBtn").style.display = "none";
+
     // Render appropriate page
-    if (page === 'puantaj') renderPuantaj();
-    else if (page === 'employees') renderEmployees();
-    else if (page === 'report') renderReport();
+    if (page === "puantaj") renderPuantaj();
+    else if (page === "employees") renderEmployees();
+    else if (page === "report") renderReport();
 }
 
 // ===========================================
@@ -202,17 +208,17 @@ function showPage(page) {
  */
 function addEmployee() {
     const id = Date.now();
-    state.employees.push({ id, name: '' });
+    state.employees.push({ id, name: "" });
     state.dirtyEmployees.add(id);
 
     // Initialize with default shift for today
     const dateKey = formatDate(state.currentDate);
     if (!state.records[dateKey]) state.records[dateKey] = {};
-    state.records[dateKey][id] = { 
-        start: CONFIG.DEFAULT_SHIFT.start, 
-        end: CONFIG.DEFAULT_SHIFT.end, 
-        mesai: 0, 
-        off: false 
+    state.records[dateKey][id] = {
+        start: CONFIG.DEFAULT_SHIFT.start,
+        end: CONFIG.DEFAULT_SHIFT.end,
+        mesai: 0,
+        off: false,
     };
 
     renderEmployees();
@@ -220,7 +226,9 @@ function addEmployee() {
 
     // Focus on the new input
     setTimeout(() => {
-        const input = document.querySelector(`[data-emp-id="${id}"] .employee-input`);
+        const input = document.querySelector(
+            `[data-emp-id="${id}"] .employee-input`
+        );
         if (input) input.focus();
     }, 100);
 }
@@ -230,8 +238,8 @@ function addEmployee() {
  * @param {number} id - Employee ID
  */
 function deleteEmployee(id) {
-    if (confirm('Bu çalışanı silmek istediğinize emin misiniz?')) {
-        state.employees = state.employees.filter(e => e.id !== id);
+    if (confirm("Bu çalışanı silmek istediğinize emin misiniz?")) {
+        state.employees = state.employees.filter((e) => e.id !== id);
         renderEmployees();
         saveData();
     }
@@ -243,14 +251,14 @@ function deleteEmployee(id) {
  * @param {string} name - New name
  */
 function updateEmployeeName(id, name) {
-    const emp = state.employees.find(e => e.id === id);
+    const emp = state.employees.find((e) => e.id === id);
     if (emp) {
         emp.name = name;
         state.dirtyEmployees.delete(id);
         state.savedFlash.add(id);
         saveData();
         renderEmployees();
-        
+
         setTimeout(() => {
             state.savedFlash.delete(id);
             renderEmployees();
@@ -263,7 +271,9 @@ function updateEmployeeName(id, name) {
  * @param {number} id - Employee ID
  */
 function saveEmployeeName(id) {
-    const input = document.querySelector(`[data-emp-id="${id}"] .employee-input`);
+    const input = document.querySelector(
+        `[data-emp-id="${id}"] .employee-input`
+    );
     if (!input) return;
     updateEmployeeName(id, input.value.trim());
     input.blur();
@@ -285,7 +295,9 @@ function startEdit(id) {
     state.dirtyEmployees.add(id);
     renderEmployees();
     setTimeout(() => {
-        const input = document.querySelector(`[data-emp-id="${id}"] .employee-input`);
+        const input = document.querySelector(
+            `[data-emp-id="${id}"] .employee-input`
+        );
         if (input) input.focus();
     }, 30);
 }
@@ -316,10 +328,13 @@ function updateRecord(empId, field, value) {
     const dateKey = formatDate(state.currentDate);
     ensureDayRecord(dateKey, empId);
 
-    if (field === 'off') {
+    if (field === "off") {
         state.records[dateKey][empId].off = value;
-    } else if (field === 'mesai') {
-        state.records[dateKey][empId].mesai = Math.max(0, Math.min(CONFIG.MAX_MESAI_HOURS, parseInt(value) || 0));
+    } else if (field === "mesai") {
+        state.records[dateKey][empId].mesai = Math.max(
+            0,
+            Math.min(CONFIG.MAX_MESAI_HOURS, parseInt(value) || 0)
+        );
     } else {
         state.records[dateKey][empId][field] = value;
     }
@@ -337,19 +352,19 @@ function updateRecord(empId, field, value) {
  */
 function setAllDefaultShift() {
     const dateKey = formatDate(state.currentDate);
-    const namedEmployees = state.employees.filter(e => e.name.trim());
-    
+    const namedEmployees = state.employees.filter((e) => e.name.trim());
+
     if (!state.records[dateKey]) state.records[dateKey] = {};
-    
-    namedEmployees.forEach(emp => {
-        state.records[dateKey][emp.id] = { 
-            start: CONFIG.DEFAULT_SHIFT.start, 
-            end: CONFIG.DEFAULT_SHIFT.end, 
-            mesai: 0, 
-            off: false 
+
+    namedEmployees.forEach((emp) => {
+        state.records[dateKey][emp.id] = {
+            start: CONFIG.DEFAULT_SHIFT.start,
+            end: CONFIG.DEFAULT_SHIFT.end,
+            mesai: 0,
+            off: false,
         };
     });
-    
+
     renderPuantaj();
     saveData();
 }
@@ -360,20 +375,22 @@ function setAllDefaultShift() {
  */
 function setAllMesai(hours = 2) {
     const dateKey = formatDate(state.currentDate);
-    const namedEmployees = state.employees.filter(e => e.name.trim());
-    
+    const namedEmployees = state.employees.filter((e) => e.name.trim());
+
     if (!state.records[dateKey]) state.records[dateKey] = {};
-    
-    namedEmployees.forEach(emp => {
-        const existing = state.records[dateKey][emp.id] || { ...DEFAULT_RECORD };
+
+    namedEmployees.forEach((emp) => {
+        const existing = state.records[dateKey][emp.id] || {
+            ...DEFAULT_RECORD,
+        };
         state.records[dateKey][emp.id] = {
             start: existing.start || CONFIG.DEFAULT_SHIFT.start,
             end: existing.end || CONFIG.DEFAULT_SHIFT.end,
             mesai: Math.max(0, hours),
-            off: false
+            off: false,
         };
     });
-    
+
     renderPuantaj();
     saveData();
 }
@@ -383,14 +400,19 @@ function setAllMesai(hours = 2) {
  */
 function setAllOff() {
     const dateKey = formatDate(state.currentDate);
-    const namedEmployees = state.employees.filter(e => e.name.trim());
-    
+    const namedEmployees = state.employees.filter((e) => e.name.trim());
+
     if (!state.records[dateKey]) state.records[dateKey] = {};
-    
-    namedEmployees.forEach(emp => {
-        state.records[dateKey][emp.id] = { start: '', end: '', mesai: 0, off: true };
+
+    namedEmployees.forEach((emp) => {
+        state.records[dateKey][emp.id] = {
+            start: "",
+            end: "",
+            mesai: 0,
+            off: true,
+        };
     });
-    
+
     renderPuantaj();
     saveData();
 }
@@ -403,16 +425,16 @@ function copyYesterday() {
     prev.setDate(prev.getDate() - 1);
     const prevKey = formatDate(prev);
     const todayKey = formatDate(state.currentDate);
-    const namedEmployees = state.employees.filter(e => e.name.trim());
+    const namedEmployees = state.employees.filter((e) => e.name.trim());
 
     if (!state.records[prevKey]) {
-        alert('Dün için kayıt yok.');
+        alert("Dün için kayıt yok.");
         return;
     }
 
     if (!state.records[todayKey]) state.records[todayKey] = {};
 
-    namedEmployees.forEach(emp => {
+    namedEmployees.forEach((emp) => {
         const rec = state.records[prevKey][emp.id];
         if (rec) {
             state.records[todayKey][emp.id] = { ...rec };
@@ -436,11 +458,13 @@ function renderPuantaj() {
 
     // Update date display
     const isToday = dateKey === today;
-    document.getElementById('currentDay').textContent = isToday ? 'Bugün' : '';
-    document.getElementById('currentDate').textContent = formatDateTR(state.currentDate);
+    document.getElementById("currentDay").textContent = isToday ? "Bugün" : "";
+    document.getElementById("currentDate").textContent = formatDateTR(
+        state.currentDate
+    );
 
-    const container = document.getElementById('puantajList');
-    const namedEmployees = state.employees.filter(e => e.name.trim());
+    const container = document.getElementById("puantajList");
+    const namedEmployees = state.employees.filter((e) => e.name.trim());
 
     // Show empty state if no employees
     if (namedEmployees.length === 0) {
@@ -456,56 +480,69 @@ function renderPuantaj() {
     const dayRecords = state.records[dateKey] || {};
 
     // Render employee cards
-    container.innerHTML = namedEmployees.map(emp => {
-        const rec = dayRecords[emp.id] || { ...DEFAULT_RECORD };
-        const isOff = rec.off;
-        const hasMesai = rec.mesai > 0;
+    container.innerHTML = namedEmployees
+        .map((emp) => {
+            const rec = dayRecords[emp.id] || { ...DEFAULT_RECORD };
+            const isOff = rec.off;
+            const hasMesai = rec.mesai > 0;
 
-        let cardClass = 'puantaj-card';
-        if (isOff) cardClass += ' off';
-        else if (hasMesai) cardClass += ' mesai';
-        else cardClass += ' worked';
+            let cardClass = "puantaj-card";
+            if (isOff) cardClass += " off";
+            else if (hasMesai) cardClass += " mesai";
+            else cardClass += " worked";
 
-        const baseHours = (rec.start && rec.end) ? calcHours(rec.start, rec.end) : 0;
-        const hours = isOff ? 0 : baseHours + (rec.mesai || 0);
+            const baseHours =
+                rec.start && rec.end ? calcHours(rec.start, rec.end) : 0;
+            const hours = isOff ? 0 : baseHours + (rec.mesai || 0);
 
-        return `
+            return `
             <div class="${cardClass}">
                 <div class="emp-info">
                     <div class="emp-name">${emp.name}</div>
                     <div class="emp-hours">
-                        ${isOff ? 'İzinli' : hours.toFixed(1) + ' saat'} 
-                        ${hasMesai ? `<span class="mesai-badge">+${rec.mesai} mesai</span>` : ''}
+                        ${isOff ? "İzinli" : hours.toFixed(1) + " saat"} 
+                        ${
+                            hasMesai
+                                ? `<span class="mesai-badge">+${rec.mesai} mesai</span>`
+                                : ""
+                        }
                     </div>
                 </div>
                 <div class="puantaj-inputs">
                     <input type="time" class="time-input" value="${rec.start}" 
-                        placeholder="Giriş" ${isOff ? 'disabled' : ''}
+                        placeholder="Giriş" ${isOff ? "disabled" : ""}
                         onchange="updateRecord(${emp.id}, 'start', this.value)">
                     <input type="time" class="time-input" value="${rec.end}" 
-                        placeholder="Çıkış" ${isOff ? 'disabled' : ''}
+                        placeholder="Çıkış" ${isOff ? "disabled" : ""}
                         onchange="updateRecord(${emp.id}, 'end', this.value)">
                     <div style="display:flex; align-items:center; gap:6px;">
                         <span class="mesai-chip">Mesai</span>
-                        <input type="number" class="mesai-input" value="${rec.mesai}" 
+                        <input type="number" class="mesai-input" value="${
+                            rec.mesai
+                        }" 
                             min="0" max="${CONFIG.MAX_MESAI_HOURS}"
-                            placeholder="Saat" ${isOff ? 'disabled' : ''}
-                            onchange="updateRecord(${emp.id}, 'mesai', this.value)">
+                            placeholder="Saat" ${isOff ? "disabled" : ""}
+                            onchange="updateRecord(${
+                                emp.id
+                            }, 'mesai', this.value)">
                     </div>
-                    <button class="off-btn ${isOff ? 'active' : ''}" 
+                    <button class="off-btn ${isOff ? "active" : ""}" 
                         onclick="updateRecord(${emp.id}, 'off', ${!isOff})">
-                        ${isOff ? '✓ İzin' : 'İzin'}
+                        ${isOff ? "✓ İzin" : "İzin"}
                     </button>
                 </div>
             </div>
         `;
-    }).join('');
+        })
+        .join("");
 
     // Update summary with current data
-    updateSummary(namedEmployees.map(emp => ({
-        ...emp,
-        ...(dayRecords[emp.id] || { ...DEFAULT_RECORD })
-    })));
+    updateSummary(
+        namedEmployees.map((emp) => ({
+            ...emp,
+            ...(dayRecords[emp.id] || { ...DEFAULT_RECORD }),
+        }))
+    );
 }
 
 /**
@@ -513,33 +550,37 @@ function renderPuantaj() {
  * @param {Array} data - Array of employee records for the day
  */
 function updateSummary(data) {
-    const working = data.filter(d => !d.off);
-    const mesaiOnes = working.filter(d => d.mesai > 0);
+    const working = data.filter((d) => !d.off);
+    const mesaiOnes = working.filter((d) => d.mesai > 0);
 
     let totalHours = 0;
-    working.forEach(d => {
-        const base = (d.start && d.end) ? calcHours(d.start, d.end) : 0;
+    working.forEach((d) => {
+        const base = d.start && d.end ? calcHours(d.start, d.end) : 0;
         totalHours += base + (d.mesai || 0);
     });
 
-    document.getElementById('workingCount').textContent = working.length;
-    document.getElementById('mesaiCount').textContent = mesaiOnes.length;
-    document.getElementById('totalHours').textContent = totalHours.toFixed(1);
+    document.getElementById("workingCount").textContent = working.length;
+    document.getElementById("mesaiCount").textContent = mesaiOnes.length;
+    document.getElementById("totalHours").textContent = totalHours.toFixed(1);
 
     // Render overtime summary
-    const mesaiSummary = document.getElementById('mesaiSummary');
-    const mesaiList = document.getElementById('mesaiList');
+    const mesaiSummary = document.getElementById("mesaiSummary");
+    const mesaiList = document.getElementById("mesaiList");
 
     if (mesaiOnes.length > 0) {
-        mesaiSummary.style.display = 'block';
-        mesaiList.innerHTML = mesaiOnes.map(d => `
+        mesaiSummary.style.display = "block";
+        mesaiList.innerHTML = mesaiOnes
+            .map(
+                (d) => `
             <div class="mesai-person">
                 <span>${d.name}</span>
                 <span class="hours">${d.mesai} saat</span>
             </div>
-        `).join('');
+        `
+            )
+            .join("");
     } else {
-        mesaiSummary.style.display = 'none';
+        mesaiSummary.style.display = "none";
     }
 }
 
@@ -547,7 +588,7 @@ function updateSummary(data) {
  * Render the Employees management page
  */
 function renderEmployees() {
-    const container = document.getElementById('employeeSection');
+    const container = document.getElementById("employeeSection");
 
     if (state.employees.length === 0) {
         container.innerHTML = `
@@ -559,23 +600,37 @@ function renderEmployees() {
     }
 
     container.innerHTML = `
-        <div class="section-title">Toplam ${state.employees.length} çalışan</div>
-        ${state.employees.map((emp, i) => `
+        <div class="section-title">Toplam ${
+            state.employees.length
+        } çalışan</div>
+        ${state.employees
+            .map(
+                (emp, i) => `
             <div class="employee-item" data-emp-id="${emp.id}">
                 <div class="employee-num">${i + 1}</div>
                 <input type="text" class="employee-input" value="${emp.name}" 
                     placeholder="İsim girin..." oninput="markDirty(${emp.id})">
-                ${state.dirtyEmployees.has(emp.id) ? `
+                ${
+                    state.dirtyEmployees.has(emp.id)
+                        ? `
                     <button class="save-btn" onclick="saveEmployeeName(${emp.id})">Kaydet</button>
-                ` : state.savedFlash.has(emp.id) ? `
+                `
+                        : state.savedFlash.has(emp.id)
+                        ? `
                     <span class="status-badge">Kaydedildi</span>
                     <button class="edit-btn" onclick="startEdit(${emp.id})">Düzenle</button>
-                ` : `
+                `
+                        : `
                     <button class="edit-btn" onclick="startEdit(${emp.id})">Düzenle</button>
-                `}
-                <button class="delete-btn" onclick="deleteEmployee(${emp.id})">🗑️</button>
+                `
+                }
+                <button class="delete-btn" onclick="deleteEmployee(${
+                    emp.id
+                })">🗑️</button>
             </div>
-        `).join('')}
+        `
+            )
+            .join("")}
     `;
 }
 
@@ -583,8 +638,8 @@ function renderEmployees() {
  * Render the Report page
  */
 function renderReport() {
-    const container = document.getElementById('reportSection');
-    const namedEmployees = state.employees.filter(e => e.name.trim());
+    const container = document.getElementById("reportSection");
+    const namedEmployees = state.employees.filter((e) => e.name.trim());
 
     if (namedEmployees.length === 0) {
         container.innerHTML = `
@@ -600,34 +655,38 @@ function renderReport() {
     const year = now.getFullYear();
     const month = now.getMonth();
 
-    const monthlyData = namedEmployees.map(emp => {
+    const monthlyData = namedEmployees.map((emp) => {
         let totalHours = 0;
         let totalMesai = 0;
         let workDays = 0;
         const daily = [];
 
-        Object.keys(state.records).forEach(dateKey => {
+        Object.keys(state.records).forEach((dateKey) => {
             const date = new Date(dateKey);
             if (date.getFullYear() === year && date.getMonth() === month) {
                 const rec = state.records[dateKey]?.[emp.id];
                 if (rec) {
-                    const base = (rec.start && rec.end && !rec.off) ? calcHours(rec.start, rec.end) : 0;
-                    const mesai = rec.off ? 0 : (rec.mesai || 0);
+                    const base =
+                        rec.start && rec.end && !rec.off
+                            ? calcHours(rec.start, rec.end)
+                            : 0;
+                    const mesai = rec.off ? 0 : rec.mesai || 0;
                     const dayHours = rec.off ? 0 : base + mesai;
-                    if (!rec.off && (rec.start || rec.end || mesai > 0)) workDays++;
+                    if (!rec.off && (rec.start || rec.end || mesai > 0))
+                        workDays++;
                     totalHours += dayHours;
                     totalMesai += mesai;
                     daily.push({
                         dateKey,
-                        dateText: date.toLocaleDateString('tr-TR', { 
-                            day: 'numeric', 
-                            month: 'long', 
-                            weekday: 'short' 
+                        dateText: date.toLocaleDateString("tr-TR", {
+                            day: "numeric",
+                            month: "long",
+                            weekday: "short",
                         }),
                         off: rec.off,
                         base: base,
                         mesai: mesai,
-                        total: dayHours
+                        total: dayHours,
                     });
                 }
             }
@@ -638,11 +697,16 @@ function renderReport() {
         return { name: emp.name, workDays, totalHours, totalMesai, daily };
     });
 
-    const monthName = now.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
+    const monthName = now.toLocaleDateString("tr-TR", {
+        month: "long",
+        year: "numeric",
+    });
 
     container.innerHTML = `
         <div class="section-title">${monthName}</div>
-        ${monthlyData.map((d, idx) => `
+        ${monthlyData
+            .map(
+                (d, idx) => `
             <div class="report-item" onclick="toggleReportDetail(${idx})">
                 <div class="report-header">
                     <div>
@@ -650,20 +714,44 @@ function renderReport() {
                         <div class="emp-hours">${d.workDays} gün çalıştı</div>
                     </div>
                     <div style="text-align:right">
-                        <div style="font-weight:700;color:#2563eb">${d.totalHours.toFixed(1)} saat</div>
-                        ${d.totalMesai > 0 ? `<div style="font-size:0.75rem;color:#10b981">+${d.totalMesai} mesai</div>` : ''}
+                        <div style="font-weight:700;color:#2563eb">${d.totalHours.toFixed(
+                            1
+                        )} saat</div>
+                        ${
+                            d.totalMesai > 0
+                                ? `<div style="font-size:0.75rem;color:#10b981">+${d.totalMesai} mesai</div>`
+                                : ""
+                        }
                     </div>
                 </div>
                 <div class="report-detail" id="reportDetail-${idx}">
-                    ${d.daily.length === 0 ? '<div class="report-row">Kayıt yok</div>' : d.daily.map(r => `
+                    ${
+                        d.daily.length === 0
+                            ? '<div class="report-row">Kayıt yok</div>'
+                            : d.daily
+                                  .map(
+                                      (r) => `
                         <div class="report-row">
                             <span>${r.dateText}</span>
-                            <span>${r.off ? 'İzinli' : `${r.total.toFixed(1)} saat${r.mesai > 0 ? ' (+' + r.mesai + ' mesai)' : ''}`}</span>
+                            <span>${
+                                r.off
+                                    ? "İzinli"
+                                    : `${r.total.toFixed(1)} saat${
+                                          r.mesai > 0
+                                              ? " (+" + r.mesai + " mesai)"
+                                              : ""
+                                      }`
+                            }</span>
                         </div>
-                    `).join('')}
+                    `
+                                  )
+                                  .join("")
+                    }
                 </div>
             </div>
-        `).join('')}
+        `
+            )
+            .join("")}
     `;
 
     // Store for PDF export
@@ -675,8 +763,8 @@ function renderReport() {
  * @param {number} idx - Report index
  */
 function toggleReportDetail(idx) {
-    const el = document.getElementById('reportDetail-' + idx);
-    if (el) el.classList.toggle('show');
+    const el = document.getElementById("reportDetail-" + idx);
+    if (el) el.classList.toggle("show");
 }
 
 // ===========================================
@@ -698,11 +786,16 @@ function ensureReportData() {
 function exportReportPDF() {
     const data = ensureReportData();
     const now = new Date();
-    const monthName = now.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
+    const monthName = now.toLocaleDateString("tr-TR", {
+        month: "long",
+        year: "numeric",
+    });
 
-    const popup = window.open('', '_blank');
+    const popup = window.open("", "_blank");
     if (!popup) {
-        alert('Açılır pencere engellendi. Lütfen bu site için açılır pencere izni verin.');
+        alert(
+            "Açılır pencere engellendi. Lütfen bu site için açılır pencere izni verin."
+        );
         return;
     }
 
@@ -723,35 +816,59 @@ function exportReportPDF() {
 
     const content = [
         `<h1>${monthName} Detaylı Rapor</h1>`,
-        `<div class="meta">İndirilen tarih: ${new Date().toLocaleString('tr-TR')}</div>`
+        `<div class="meta">İndirilen tarih: ${new Date().toLocaleString(
+            "tr-TR"
+        )}</div>`,
     ];
 
     if (data.length === 0) {
-        content.push('<div>Bu ay için kayıt yok.</div>');
+        content.push("<div>Bu ay için kayıt yok.</div>");
     } else {
-        data.forEach(d => {
+        data.forEach((d) => {
             content.push(`
                 <div class="emp-block">
                     <div class="emp-summary">
                         ${d.name} — ${d.totalHours.toFixed(1)} saat 
-                        ${d.totalMesai > 0 ? '(+' + d.totalMesai + ' mesai)' : ''} — ${d.workDays} gün
+                        ${
+                            d.totalMesai > 0
+                                ? "(+" + d.totalMesai + " mesai)"
+                                : ""
+                        } — ${d.workDays} gün
                     </div>
-                    ${d.daily.length === 0 ? '<div class="no-data">Kayıt yok</div>' : `
+                    ${
+                        d.daily.length === 0
+                            ? '<div class="no-data">Kayıt yok</div>'
+                            : `
                         <table>
                             <thead>
                                 <tr><th>Tarih</th><th>Durum</th><th>Saat</th></tr>
                             </thead>
                             <tbody>
-                                ${d.daily.map(r => `
+                                ${d.daily
+                                    .map(
+                                        (r) => `
                                     <tr>
                                         <td>${r.dateText}</td>
-                                        <td>${r.off ? 'İzinli' : 'Çalıştı'}</td>
-                                        <td>${r.off ? '-' : `${r.total.toFixed(1)} saat${r.mesai > 0 ? ' (+' + r.mesai + ')' : ''}`}</td>
+                                        <td>${r.off ? "İzinli" : "Çalıştı"}</td>
+                                        <td>${
+                                            r.off
+                                                ? "-"
+                                                : `${r.total.toFixed(1)} saat${
+                                                      r.mesai > 0
+                                                          ? " (+" +
+                                                            r.mesai +
+                                                            ")"
+                                                          : ""
+                                                  }`
+                                        }</td>
                                     </tr>
-                                `).join('')}
+                                `
+                                    )
+                                    .join("")}
                             </tbody>
                         </table>
-                    `}
+                    `
+                    }
                 </div>
             `);
         });
@@ -760,7 +877,7 @@ function exportReportPDF() {
     popup.document.write(`
         <html>
             <head><title>${monthName} Rapor</title>${style}</head>
-            <body>${content.join('')}</body>
+            <body>${content.join("")}</body>
         </html>
     `);
     popup.document.close();
@@ -777,8 +894,10 @@ function exportReportPDF() {
  * @returns {boolean}
  */
 function isStandalone() {
-    return window.matchMedia('(display-mode: standalone)').matches || 
-           window.navigator.standalone;
+    return (
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone
+    );
 }
 
 /**
@@ -786,16 +905,16 @@ function isStandalone() {
  */
 function showInstallCTA() {
     if (isStandalone()) return;
-    const cta = document.getElementById('installCta');
-    if (cta) cta.style.display = 'flex';
+    const cta = document.getElementById("installCta");
+    if (cta) cta.style.display = "flex";
 }
 
 /**
  * Hide PWA install prompt
  */
 function hideInstallCTA() {
-    const cta = document.getElementById('installCta');
-    if (cta) cta.style.display = 'none';
+    const cta = document.getElementById("installCta");
+    if (cta) cta.style.display = "none";
 }
 
 /**
@@ -805,10 +924,12 @@ async function installApp() {
     if (state.deferredPrompt) {
         state.deferredPrompt.prompt();
         const choice = await state.deferredPrompt.userChoice;
-        if (choice.outcome === 'accepted') hideInstallCTA();
+        if (choice.outcome === "accepted") hideInstallCTA();
         state.deferredPrompt = null;
     } else {
-        alert('Eğer "Ana ekrana ekle" uyarısı çıkmazsa:\n\n- iPhone: Paylaş → Ana Ekrana Ekle\n- Android: Sağ üst ⋮ → Ana ekrana ekle');
+        alert(
+            'Eğer "Ana ekrana ekle" uyarısı çıkmazsa:\n\n- iPhone: Paylaş → Ana Ekrana Ekle\n- Android: Sağ üst ⋮ → Ana ekrana ekle'
+        );
     }
 }
 
@@ -817,14 +938,14 @@ async function installApp() {
 // ===========================================
 
 // PWA install prompt handler
-window.addEventListener('beforeinstallprompt', (e) => {
+window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     state.deferredPrompt = e;
     showInstallCTA();
 });
 
 // Show install CTA after load
-window.addEventListener('load', () => {
+window.addEventListener("load", () => {
     if (!isStandalone()) {
         setTimeout(showInstallCTA, 1200);
     }
@@ -839,18 +960,18 @@ window.addEventListener('load', () => {
  */
 async function init() {
     // Register service worker for offline support
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(console.error);
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
     }
 
     // Load persisted data
     await loadData();
-    
+
     // Render initial view
     renderPuantaj();
-    
+
     // Hide add button initially
-    document.getElementById('addBtn').style.display = 'none';
+    document.getElementById("addBtn").style.display = "none";
 }
 
 // Start the app

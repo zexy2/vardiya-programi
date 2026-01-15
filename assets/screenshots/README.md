@@ -4,8 +4,8 @@ This folder contains screenshots used in the README documentation.
 
 ## Required Screenshots
 
-| File | Description | Size |
-|------|-------------|------|
+| File       | Description         | Size                                       |
+| ---------- | ------------------- | ------------------------------------------ |
 | `demo.png` | Main app screenshot | 1080×1920 (or similar mobile aspect ratio) |
 
 ## Taking Screenshots

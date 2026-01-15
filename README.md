@@ -55,8 +55,8 @@ Then open `http://localhost:8000` in your browser.
 
 ## 📱 Screenshots
 
-| Timesheet | Employees | Report |
-|-----------|-----------|--------|
+| Timesheet            | Employees            | Report          |
+| -------------------- | -------------------- | --------------- |
 | Daily shift tracking | Manage employee list | Monthly summary |
 
 ## 🏗️ Project Structure
@@ -117,12 +117,12 @@ vardiya-programi/
 ## 🌐 Browser Support
 
 | Browser | Support |
-|---------|---------|
-| Chrome | ✅ Full |
-| Firefox | ✅ Full |
-| Safari | ✅ Full |
-| Edge | ✅ Full |
-| Opera | ✅ Full |
+| ------- | ------- |
+| Chrome  | ✅ Full  |
+| Firefox | ✅ Full  |
+| Safari  | ✅ Full  |
+| Edge    | ✅ Full  |
+| Opera   | ✅ Full  |
 
 ## 📝 License
 
