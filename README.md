@@ -2,7 +2,7 @@
 
 PWA for tracking employee shifts and overtime. Works offline.
 
-**Demo:** https://zexy2.github.io/vardiya-programi/
+**Demo:** https://zexy2.github.io/Employee-shift-tracking-PWA/
 
 ## Features
 
